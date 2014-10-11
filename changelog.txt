@@ -1,0 +1,10 @@
+v 0.0.3
+ + Added AutoIt script/exe to switch between XBMC and player
+   handle the backspace key to close the player and restore XBMC
+
+v 0.0.2
+ + Version bump for repository integration
+
+v 0.0.1
+
+ + Initial test version

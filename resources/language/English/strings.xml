@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+
+	<!-- Settings start at 30000 -->
+	
+
+
+	<!-- Lists start at 30100 -->
+	<string id="30100">Browse Genres</string>
+	<string id="30101">Sub Genres</string>
+</strings>
