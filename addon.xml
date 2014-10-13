@@ -7,7 +7,7 @@
     <provides>video audio image</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <platform>all</platform>
+    <platform>windx</platform>
     <minversion>1</minversion>
     <summary lang="en">Unnofficial Netflix plugin for XBMC</summary>
     <description lang="en">Unnofficial Netflix plugin for XBMC.</description>

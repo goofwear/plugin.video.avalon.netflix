@@ -19,6 +19,10 @@ addonID = addon.getAddonInfo('id')
 metapath = xbmc.translatePath('special://profile/addon_data/' + addonID + '/meta')
 
 playerpath = xbmc.translatePath('special://home/addons/' + addonID + '/resources/LaunchPlayer.exe')
+tvplayerpath = xbmc.translatePath('special://home/addons/' + addonID + '/resources/LaunchPlayerTV.exe')
+
+username=addon.getSetting("username")
+password=addon.getSetting("password")
 
 def index():
 	li = xbmcgui.ListItem(translation(30100))
@@ -153,6 +157,7 @@ def listEpisodes(seriesid, season):
 	if os.path.exists(cachepath):
 		for ffile in os.listdir(os.path.join(metapath,"titles",seriesid, "Season " + str(season))):
 			if ffile.endswith('.json'):
+
 				fh = open(os.path.join(cachepath,ffile), 'r')
 				content = fh.read()
 				fh.close()
@@ -164,10 +169,16 @@ def listEpisodes(seriesid, season):
 				for title, season, episode, synopsis, seasonid, episodeid, videoid, runtime, bookmark in match:
 					thumb = os.path.join(cachepath, ffile.replace(".json", ".jpg"))
 					
-					li = xbmcgui.ListItem(title, thumbnailImage=thumb)
-					li.setInfo(type="video", infoLabels={"title":title, "plot": synopsis, "duration": runtime, "season": season, "episode": episode})
+					playcount=0
+					if (float(bookmark)/float(runtime))>=0.9:
+						playcount=1
 
-					url = sys.argv[0] + "?mode=playvideo&title=" + videoid;
+
+					
+					li = xbmcgui.ListItem(title, thumbnailImage=thumb)
+					li.setInfo(type="video", infoLabels={"title":title, "plot": synopsis, "duration": runtime, "season": season, "episode": episode, "playcount": playcount})
+
+					url = sys.argv[0] + "?mode=playepisode&title=" + episodeid + "&series=" + videoid;
 
 					xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=False)
 
@@ -212,7 +223,15 @@ def listSubGenres(genreid):
 def playVideo(videoid):
 	xbmc.Player().stop()
 	print '"'+playerpath+'" '+videoid
-	subprocess.Popen(playerpath + ' /movieid='+videoid, shell=True)
+	subprocess.Popen(playerpath + ' /movieid='+videoid, shell=False)
+
+
+def playEpisode(videoid, seriesid):
+	xbmc.Player().stop()
+	print '"'+tvplayerpath+'" '+videoid
+	subprocess.Popen(playerpath + ' /movieid=' + videoid + ' /seriesid=' + seriesid + ' /savepath=' + os.path.join(metapath, "titles", seriesid) + ' /un=' + addon.getSetting("username") + ' /pw=' + addon.getSetting("password"), shell=False)
+
+
 
 # Utiltity methods
 def translation(id):
@@ -238,7 +257,12 @@ seriesid = urllib.unquote_plus(params.get('series',''))
 season = urllib.unquote_plus(params.get('season',''))
 genre = urllib.unquote_plus(params.get('genre',''))
 
-
+while(username == "" or password == ""):
+	d = xbmcgui.Dialog()
+	addon.setSetting("username", d.input(translation(30004)))
+	addon.setSetting("password", d.input(translation(30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
+	username=addon.getSetting("username")
+	password=addon.getSetting("password")
 
 
 
@@ -255,5 +279,7 @@ elif mode == 'listepisodes':
 	listEpisodes(seriesid, season)
 elif mode == 'playvideo':
 	playVideo(videoid)
+elif mode == 'playepisode':
+	playEpisode(videoid, seriesid)
 else:
 	index()

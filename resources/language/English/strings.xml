@@ -2,6 +2,11 @@
 <strings>
 
 	<!-- Settings start at 30000 -->
+	<string id="30001">Authentication</string>
+	<string id="30002">Username</string>
+	<string id="30003">Password</string>
+	<string id="30004">Enter your Netflix Username/email</string>
+	<string id="30005">Enter your Netflix password</string>
 	
 
 
