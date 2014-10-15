@@ -1,3 +1,6 @@
+v 0.0.4
+ + Added initial handling of watched markers
+
 v 0.0.3
  + Added AutoIt script/exe to switch between XBMC and player
    handle the backspace key to close the player and restore XBMC

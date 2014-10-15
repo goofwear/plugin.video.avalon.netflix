@@ -90,26 +90,71 @@ def listTitle(titleid):
 			match = re.compile('{"isMovie":.*?,"isShow":(.*?),"titleid":(.*?),"title":"(.*?)","mdpLink":".*?","synopsis":"(.*?)","year":(.*?),"profileName":".*?","trackId":(.*?),"showMyList":.*?,"actors":\[.*?\],"inPlayList":.*?,"maturityLabel":"(.*?)","maturityLevel":.*?,"averageRating":(.*?),"predictedRating":.*?,"yourRating":.*?,"numSeasons":(.*?),"creators":\[.*?\],"directors":\[.*?\]}', re.DOTALL).findall(content)
 
 
+			xbmcplugin.setContent(pluginhandle, 'tvshows')
+
+
+
 
 
 			url = sys.argv[0] + "?mode=listseasons&series=" + titleid
 
 			for isshow, titleid, title, synopsis, year, trackid, certificate, rating, seasons in match:
 
+				tmpRating = float(rating)*2;
+
+
+				rating=str(tmpRating)
+
 
 				li = xbmcgui.ListItem(cleanString(title), iconImage=thumbfile, thumbnailImage=thumbfile)
-				li.setInfo(type="video", infoLabels={"title": cleanString(title), "plot": cleanString(synopsis), "year": year, "mpaa": certificate, "rating": rating}) # , "director": director, "genre": genre
+
+				fh = open(os.path.join(metapath, 'titles', titleid, 'seasonddata.json'), 'r')
+				episodecontent = fh.read()
+				fh.close()
+
+				episodeexpr = '{"title":".*?","season":(.*?),"seasonYear":.*?,"episode":.*?,"synopsis":".*?","seasonId":.*?,"episodeId":.*?,"videoId":.*?,"nonMemberViewable":.*?,"runtime":(.*?),"availableForED":.*?,"availabilityMessage":.*?,"stills":\[.*?\],"bookmarkPosition":(.*?),"lastModified":".*?"}'
+				matchepisodes = re.compile(episodeexpr, re.DOTALL).findall(episodecontent)
+
+				watched = 0
+				episodecount = 0
+				for season, runtime, bookmark in matchepisodes:
+					episodecount = episodecount + 1;
+					playcount=0
+					if (float(bookmark)/float(runtime))>=0.9:
+						playcount=1
+					watched = watched + playcount
+
+				playcount = 0
+				if (episodecount - watched) == 0:
+					playcount = 1
+				elif watched == 0:
+					playcount = 0
+				else:
+					li.setProperty('TotalTime', '100')
+					li.setProperty('ResumeTime', '50')
+
+
+				li.setInfo(type="video", infoLabels={"title": cleanString(title), "plot": cleanString(synopsis), "year": year, "mpaa": certificate, "rating": rating, "playcount": playcount}) # , "director": director, "genre": genre
+
+
 
 
 				xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 
 		else:
+			xbmcplugin.setContent(pluginhandle, 'movies')
+
 			match = re.compile('{"isMovie":.*?,"isShow":(.*?),"titleid":(.*?),"title":"(.*?)","mdpLink":".*?","synopsis":"(.*?)","year":(.*?),"profileName":".*?","trackId":(.*?),"showMyList":.*?,"runtime":(.*?),"actors":\[.*?\],"inPlayList":.*?,"maturityLabel":"(.*?)","maturityLevel":.*?,"averageRating":(.*?),"predictedRating":.*?,"yourRating":.*?,"creators":\[.*?\],"directors":\[.*?\]}', re.DOTALL).findall(content)
 
 
 			url = sys.argv[0] + "?mode=playvideo&title=" + titleid
 
 			for isshow, titleid, title, synopsis, year, trackid, runtime, certificate, rating in match:
+
+				tmpRating = float(rating)*2;
+
+
+				rating=str(tmpRating)
 
 				li = xbmcgui.ListItem(cleanString(title), iconImage=thumbfile, thumbnailImage=thumbfile)
 				li.setInfo(type="video", infoLabels={"title": cleanString(title), "plot": cleanString(synopsis), "duration": runtime, "year": year, "mpaa": certificate, "rating": rating}) # , "director": director, "genre": genre
@@ -120,6 +165,8 @@ def listTitle(titleid):
 
 def listSeasons(seriesid):
 	cachefile = os.path.join(metapath,"titles",seriesid, "seasonddata.json")
+
+	xbmcplugin.setContent(pluginhandle, 'seasons')
 
 	if(os.path.exists(cachefile)):
 		fh = open(cachefile, 'r')
@@ -132,27 +179,64 @@ def listSeasons(seriesid):
 	match = re.compile(expr, re.DOTALL).findall(content)
 
 	for episodes, numSeasons, synopses in match:
-		count = 0
+
+
+
+
+
+
+
+		episodeExpr = '{"title":".*?","season":(.*?),"seasonYear":.*?,"episode":.*?,"synopsis":".*?","seasonId":.*?,"episodeId":.*?,"videoId":.*?,"nonMemberViewable":.*?,"runtime":(.*?),"availableForED":.*?,"availabilityMessage":.*?,"stills":\[.*?\],"bookmarkPosition":(.*?),"lastModified":".*?"}'
+		matchEpisodes = re.compile(episodeExpr, re.DOTALL).findall(episodes)
+
+		watched = {}
+		episodecount = {}
+		for season, runtime, bookmark in matchEpisodes:
+			episodecount[season] = episodecount.get(season, 0) + 1;
+			playcount=0
+			if (float(bookmark)/float(runtime))>=0.9:
+				playcount=1
+			watched[season] = watched.get(season, 0) + playcount
 
 
 
 		expr2 = '"(.*?)"'
-		matchSynopses = re.compile(expr2, re.DOTALL).findall(synopses)
+		matchSynopses = re.compile(expr2, re.DOTALL).findall(synopses.replace("\\\"", "__X__"))
 
+
+		count = 0
 		for synopsis in matchSynopses:
 			count = count + 1
 
 			li = xbmcgui.ListItem("Season " + str(count))
-			li.setInfo(type="video", infoLabels={"title": "Season " + str(count), "plot": cleanString(synopsis) })
+
+			playcount = 0
+			if (episodecount[str(count)] - watched[str(count)]) == 0:
+				playcount = 1
+			elif watched[str(count)] == 0:
+				playcount = 0
+			else:
+				li.setProperty('TotalTime', '100')
+				li.setProperty('ResumeTime', '50')
+
+
+
+			li.setInfo(type="video", infoLabels={"title": "Season " + str(count), "plot": cleanString(synopsis.replace("__X__", "\"")), "playcount": playcount })
 
 			url = sys.argv[0] + "?mode=listepisodes&series=" + seriesid + "&season=" + str(count)
 
+			li.setProperty('TotalEpisodes', str(episodecount[str(count)]))
+			li.setProperty('WatchedEpisodes', str(watched[str(count)]))
+			li.setProperty('UnWatchedEpisodes', str(episodecount[str(count)] - watched[str(count)]))
+
 			xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
+
 
 
 	xbmcplugin.endOfDirectory(pluginhandle)
 
 def listEpisodes(seriesid, season):
+	xbmcplugin.setContent(pluginhandle, 'episodes')
 	cachepath = os.path.join(metapath,"titles",seriesid, "Season " + str(season))
 	if os.path.exists(cachepath):
 		for ffile in os.listdir(os.path.join(metapath,"titles",seriesid, "Season " + str(season))):
@@ -173,10 +257,14 @@ def listEpisodes(seriesid, season):
 					if (float(bookmark)/float(runtime))>=0.9:
 						playcount=1
 
-
 					
-					li = xbmcgui.ListItem(title, thumbnailImage=thumb)
-					li.setInfo(type="video", infoLabels={"title":title, "plot": synopsis, "duration": runtime, "season": season, "episode": episode, "playcount": playcount})
+					li = xbmcgui.ListItem(str(episode).zfill(2) + ". " + cleanString(title), thumbnailImage=thumb)
+					# not a lot of point unless we can force a title to run from the beginning!!!
+					#li.setProperty('TotalTime', runtime)
+					#li.setProperty('ResumeTime', bookmark)
+
+					print synopsis
+					li.setInfo(type="video", infoLabels={"title":str(episode).zfill(2) + ". " + cleanString(title), "plot": synopsis, "duration": runtime, "season": season, "episode": episode, "playcount": playcount})
 
 					url = sys.argv[0] + "?mode=playepisode&title=" + episodeid + "&series=" + videoid;
 
@@ -187,17 +275,23 @@ def listEpisodes(seriesid, season):
 def cleanString(inputstring):
 	s=inputstring
 
+
 	htmlCodes = (
 		("'", '&#39;'),
 		('"', '&quot;'),
 		('>', '&gt;'),
 		('<', '&lt;'),
 		('&', '&amp;'),
-		('"', '\\"')
+		('"', '\\"'), 
+
 	)
 
 	for code in htmlCodes:
 		s = s.replace(code[1], code[0])
+
+	
+
+
 	return s
 
 def listSubGenres(genreid):
