@@ -1,7 +1,10 @@
 
 import os
 import re
+import string
+import sys
 import subprocess
+import time
 import urllib
 
 import xbmcplugin
@@ -28,9 +31,22 @@ def index():
 	li = xbmcgui.ListItem(translation(30100))
 	url = sys.argv[0] + "?mode=listgenres"
 	xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
+	
+	if os.path.isdir(os.path.join(metapath, "MyList")):
+		li = xbmcgui.ListItem(translation(30102))
+		url = sys.argv[0] + "?mode=mylist"
+		xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 
 	xbmcplugin.endOfDirectory(pluginhandle)
 
+def myList():
+	if os.path.isdir(os.path.join(metapath, "MyList")):
+		for ffile in os.listdir(os.path.join(metapath,"MyList")):
+			listTitle(ffile)
+			
+		xbmcplugin.endOfDirectory(pluginhandle)
+
+	
 def listGenres():
 	cachefile = os.path.join(metapath, 'genres','genres.json')
 	if(os.path.exists(cachefile)):
@@ -55,7 +71,34 @@ def listGenres():
 	xbmcplugin.endOfDirectory(pluginhandle)
 
 def listGenreVideos(genreid):
+
+	#xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + genreid + ')')
+
 	cachefile = os.path.join(metapath, 'genretitles', genreid + '.json')
+
+
+	UpdateGenreTitles = False
+	if os.path.exists(cachefile):
+		age = xbmcvfs.Stat(cachefile).st_mtime()
+		now = time.time()
+
+		oneday = 24 * 60 * 60
+
+		if (now-age) > (oneday*int(addon.getSetting("cacheage"))):
+			UpdateGenreTitles = True
+	else:
+		UpdateGenreTitles = True
+
+	if(UpdateGenreTitles):
+		if(addon.getSetting("promptforcache")):
+			dialog = xbmcgui.Dialog()
+			ret = dialog.yesno('Netflix', translation(30201))
+			if(ret):
+				xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + genreid + ')')
+		else:
+			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + genreid + ')')
+
+
 
 	if(os.path.exists(cachefile)):
 		fh = open(cachefile, 'r')
@@ -64,13 +107,21 @@ def listGenreVideos(genreid):
 	else:
 		content = ""
 
+	
+
 	match = re.compile('{"boxart":".*?","titleId":(.*?),"title":".*?","playerUrl":".*?","trackId":.*?}', re.DOTALL).findall(content)
 	#{"boxart":"http://cdn0.nflximg.net/images/0542/11130542.jpg","titleId":70180387,"title":"Homeland","playerUrl":"http://www.netflix.com/WiPlayer?movieid=70180387&trkid=50263619","trackId":50263619}
 
 	for titleid in match:
+		#print titleid
 		listTitle(titleid)
 
 	xbmcplugin.endOfDirectory(pluginhandle)
+
+
+
+
+
 
 def listTitle(titleid):
 	cachepath = os.path.join(metapath, 'titles', titleid)
@@ -263,7 +314,7 @@ def listEpisodes(seriesid, season):
 					#li.setProperty('TotalTime', runtime)
 					#li.setProperty('ResumeTime', bookmark)
 
-					print synopsis
+					
 					li.setInfo(type="video", infoLabels={"title":str(episode).zfill(2) + ". " + cleanString(title), "plot": synopsis, "duration": runtime, "season": season, "episode": episode, "playcount": playcount})
 
 					url = sys.argv[0] + "?mode=playepisode&title=" + episodeid + "&series=" + videoid;
@@ -360,6 +411,30 @@ while(username == "" or password == ""):
 
 
 
+#xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ')')
+
+# Do we need to download genre data at startup?
+UpdateGenres = False
+if os.path.exists(os.path.join(metapath, "Genres", "genres.json")):
+	age = xbmcvfs.Stat(os.path.join(metapath, "Genres", "genres.json")).st_mtime()
+	now = time.time()
+
+	oneday = 24 * 60 * 60
+
+	if (now-age) > (oneday*int(addon.getSetting("cacheage"))):
+		UpdateGenres = True
+else:
+	UpdateGenres = True
+
+if(UpdateGenres):
+	if(addon.getSetting("promptforcache")):
+		dialog = xbmcgui.Dialog()
+		ret = dialog.yesno('Netflix', translation(30200))
+		if(ret):
+			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ')')
+	else:
+		xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ')')
+
 
 if mode == 'listgenres':
 	listGenres()
@@ -375,5 +450,7 @@ elif mode == 'playvideo':
 	playVideo(videoid)
 elif mode == 'playepisode':
 	playEpisode(videoid, seriesid)
+elif mode == 'mylist':
+	myList()
 else:
 	index()

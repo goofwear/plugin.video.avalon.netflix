@@ -4,4 +4,9 @@
 		<setting id="username" label="30002" type="text" default="" />
 		<setting id="password" label="30003" type="text" default="" option="hidden" />		
 	</category>
+	<category label="30010">
+		<setting id="cacheage" label="30011" type="number" default="30" />
+		<setting id="promptforcache" label="30012" type="bool" default="true" />
+		
+	</category>
 </settings>
