@@ -28,15 +28,27 @@ username=addon.getSetting("username")
 password=addon.getSetting("password")
 
 def index():
+
+	#create plugin list item (Browse Genres)
 	li = xbmcgui.ListItem(translation(30100))
+
+	# add context menu to refresh genre list
+	ctxItms = []
+	ctxItms.append((translation(30111), 'xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ')')) # 30111 = Refresh Genres
+	li.addContextMenuItems(ctxItms)
+
 	url = sys.argv[0] + "?mode=listgenres"
 	xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 	
+
+	# create plugin list item (MyList)
 	if os.path.isdir(os.path.join(metapath, "MyList")):
 		li = xbmcgui.ListItem(translation(30102))
+
 		url = sys.argv[0] + "?mode=mylist"
 		xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 
+	# end of directory listing
 	xbmcplugin.endOfDirectory(pluginhandle)
 
 def myList():
@@ -62,6 +74,7 @@ def listGenres():
 		ctxItms = []
 
 		ctxItms.append((translation(30101), 'Container.Update(' + sys.argv[0] + '?mode=listsubgenres&genre=' + genreid + ')',))
+		ctxItms.append((translation(30111), 'xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + genreid + ', ' + addon.getSetting("cacheage") + ')'))
 
 		li = xbmcgui.ListItem(cleanString(title))
 		li.addContextMenuItems(ctxItms)
@@ -94,9 +107,9 @@ def listGenreVideos(genreid):
 			dialog = xbmcgui.Dialog()
 			ret = dialog.yesno('Netflix', translation(30201))
 			if(ret):
-				xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + genreid + ')')
+				xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + genreid + ', ' + addon.getSetting("cacheage") + ')')
 		else:
-			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + genreid + ')')
+			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + genreid + ', ' + addon.getSetting("cacheage") + ')')
 
 
 
@@ -159,6 +172,11 @@ def listTitle(titleid):
 
 				li = xbmcgui.ListItem(cleanString(title), iconImage=thumbfile, thumbnailImage=thumbfile)
 
+				# add context menu to refresh genre list
+				ctxItms = []
+				ctxItms.append((translation(30112), 'xbmc.runscript(special://home/addons/' + addonID + '/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + titleid + ', ' + trackid  +')')) # 30112 = Refresh Title
+				li.addContextMenuItems(ctxItms)
+
 				fh = open(os.path.join(metapath, 'titles', titleid, 'seasonddata.json'), 'r')
 				episodecontent = fh.read()
 				fh.close()
@@ -208,6 +226,11 @@ def listTitle(titleid):
 				rating=str(tmpRating)
 
 				li = xbmcgui.ListItem(cleanString(title), iconImage=thumbfile, thumbnailImage=thumbfile)
+
+				ctxItms = []
+				ctxItms.append((translation(30112), 'xbmc.runscript(special://home/addons/' + addonID + '/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + titleid + ', ' + trackid + ')')) # 30112 = Refresh Title
+				li.addContextMenuItems(ctxItms)
+
 				li.setInfo(type="video", infoLabels={"title": cleanString(title), "plot": cleanString(synopsis), "duration": runtime, "year": year, "mpaa": certificate, "rating": rating}) # , "director": director, "genre": genre
 
 
@@ -287,6 +310,7 @@ def listSeasons(seriesid):
 	xbmcplugin.endOfDirectory(pluginhandle)
 
 def listEpisodes(seriesid, season):
+
 	xbmcplugin.setContent(pluginhandle, 'episodes')
 	cachepath = os.path.join(metapath,"titles",seriesid, "Season " + str(season))
 	if os.path.exists(cachepath):

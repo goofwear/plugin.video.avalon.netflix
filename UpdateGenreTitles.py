@@ -45,9 +45,6 @@ class Main:
 
 				content = netflixutils.makeGetRequest(requesturl, auth.cookiejar)
 
-				print requesturl
-				print content
-
 				match = re.compile("{\"boxart\":\"(.*?)\",\"titleId\":(.*?),\"title\":\"(.*?)\",\"playerUrl\":\"(.*?)\",\"trackId\":(.*?)}", re.DOTALL).findall(content)
 
 
@@ -61,6 +58,37 @@ class Main:
 					if not os.path.isdir(os.path.join(metapath, "genreTitles", sys.argv[3])):
 						os.mkdir(os.path.join(metapath, "genreTitles", sys.argv[3]))
 
+					#TODO: Get Boxart
+					titlefile = os.path.join(metapath, 'titles', title, 'meta.json')
+
+					# save the coverart for later!!!
+					coverart = netflixutils.makeGetRequest(boxart, auth.cookiejar)
+					if not os.path.isdir(os.path.join(metapath, "titles", titleid)):
+						os.mkdir(os.path.join(metapath, "titles", titleid))
+
+					fh = open(os.path.join(metapath, "titles", titleid, "folder.jpg"), 'wb')
+					fh.write(coverart)
+					fh.close()
+					fh = open(os.path.join(metapath, "titles", titleid, "coverart.jpg"), 'wb')
+					fh.write(coverart)
+					fh.close()
+
+
+					UpdateTitle = False
+					if os.path.exists(titlefile):
+						age = xbmcvfs.Stat(titlefile).st_mtime()
+						now = time.time()
+
+						oneday = 24 * 60 * 60
+
+						if (now-age) > (oneday*int(sys.argv[4])):
+							UpdateTitle = True
+					else:
+						UpdateTitle = True
+
+					if UpdateTitle:
+						xbmc.executebuiltin('xbmc.runscript(special://home/addons/plugin.video.avalon.netflix/UpdateTitle.py, ' + sys.argv[1] + ', ' + sys.argv[2] + ', ' + titleid + ', ' + trackid + ')')
+
 					fh = open(os.path.join(metapath, "genreTitles", sys.argv[3], titleid + ".json"), 'w')
 					fh.write(title)
 					fh.close()
@@ -71,8 +99,8 @@ class Main:
 			fh.write(titles)
 			fh.close()
 
-			if(len(sys.argv) > 4):
-				xbmc.executebuiltin('Notification("Netflix", "Titles updated for ' + sys.argv[4] + '", 5000, ' + iconpath + ')')
+			if(len(sys.argv) > 5):
+				xbmc.executebuiltin('Notification("Netflix", "' + sys.argv[4] + ' titles updated", 5000, ' + iconpath + ')')
 			else:
 				xbmc.executebuiltin('Notification("Netflix", "Titles updated", 5000, ' + iconpath + ')')
 
@@ -86,4 +114,7 @@ class Main:
 
 		if not os.path.isdir(os.path.join(metapath, "genreTitles")):
 			os.mkdir(os.path.join(metapath, "genreTitles"))
+
+		if not os.path.isdir(os.path.join(metapath, "titles")):
+			os.mkdir(os.path.join(metapath, "titles"))
 Main()

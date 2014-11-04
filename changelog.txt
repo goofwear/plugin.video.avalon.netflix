@@ -1,6 +1,12 @@
+v 0.2.0
+  + updata metadata directly from XBMC UI
+  + prompt when metadata is missing or out of date
+  - removed dependency on external scraper
+  + hide season data updater when winPlayer is closed
+
 v 0.1.0
  + Full browse functionality utilising data available from Netflix.com
- 	- requires external downloader for 
+ 	! requires external downloader for metadata extraction
 
 v 0.0.4
  + Added initial handling of watched markers

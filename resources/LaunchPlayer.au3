@@ -25,7 +25,7 @@ If $CmdLine[0] >= 1 Then
 
 	; as long as we can assume we have correct command line parameters - launch series data updater.
 	if $CmdLine[0] >= 5 Then
-		Run("UpdateSeriesData.exe " & $CmdLine[2] & " " & $CmdLine[3] & " " & $CmdLine[4] & " " & $CmdLine[5])
+		Run("UpdateSeriesData.exe " & $CmdLine[2] & " " & $CmdLine[3] & " " & $CmdLine[4] & " " & $CmdLine[5], @SW_HIDE)
 	EndIf
 
 	; return to XBMC
