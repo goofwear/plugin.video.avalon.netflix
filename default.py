@@ -13,7 +13,9 @@ import xbmcaddon
 import xbmcvfs
 
 
+sys.path.append(os.path.join(xbmc.translatePath('special://home/addons/plugin.video.avalon.netflix/'), "resources", "lib")) 
 
+import netflix_utils as netflixutils # utility methods (incl. request metering)
 
 pluginhandle = int(sys.argv[1])
 addon = xbmcaddon.Addon()
@@ -76,7 +78,7 @@ def listGenres():
 		ctxItms.append((translation(30101), 'Container.Update(' + sys.argv[0] + '?mode=listsubgenres&genre=' + genreid + ')',))
 		ctxItms.append((translation(30111), 'xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + genreid + ', ' + addon.getSetting("cacheage") + ')'))
 
-		li = xbmcgui.ListItem(cleanString(title))
+		li = xbmcgui.ListItem(netflixutils.cleanurlstring(title))
 		li.addContextMenuItems(ctxItms)
 		url = sys.argv[0] + "?mode=listgenrevideos&genre=" + genreid
 		xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
@@ -170,7 +172,7 @@ def listTitle(titleid):
 				rating=str(tmpRating)
 
 
-				li = xbmcgui.ListItem(cleanString(title), iconImage=thumbfile, thumbnailImage=thumbfile)
+				li = xbmcgui.ListItem(netflixutils.cleanurlstring(title), iconImage=thumbfile, thumbnailImage=thumbfile)
 
 				# add context menu to refresh genre list
 				ctxItms = []
@@ -203,7 +205,7 @@ def listTitle(titleid):
 					li.setProperty('ResumeTime', '50')
 
 
-				li.setInfo(type="video", infoLabels={"title": cleanString(title), "plot": cleanString(synopsis), "year": year, "mpaa": certificate, "rating": rating, "playcount": playcount}) # , "director": director, "genre": genre
+				li.setInfo(type="video", infoLabels={"title": netflixutils.cleanurlstring(title), "plot": netflixutils.cleanurlstring(synopsis), "year": year, "mpaa": certificate, "rating": rating, "playcount": playcount}) # , "director": director, "genre": genre
 
 
 
@@ -225,13 +227,13 @@ def listTitle(titleid):
 
 				rating=str(tmpRating)
 
-				li = xbmcgui.ListItem(cleanString(title), iconImage=thumbfile, thumbnailImage=thumbfile)
+				li = xbmcgui.ListItem(netflixutils.cleanurlstring(title), iconImage=thumbfile, thumbnailImage=thumbfile)
 
 				ctxItms = []
 				ctxItms.append((translation(30112), 'xbmc.runscript(special://home/addons/' + addonID + '/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + titleid + ', ' + trackid + ')')) # 30112 = Refresh Title
 				li.addContextMenuItems(ctxItms)
 
-				li.setInfo(type="video", infoLabels={"title": cleanString(title), "plot": cleanString(synopsis), "duration": runtime, "year": year, "mpaa": certificate, "rating": rating}) # , "director": director, "genre": genre
+				li.setInfo(type="video", infoLabels={"title": netflixutils.cleanurlstring(title), "plot": netflixutils.cleanurlstring(synopsis), "duration": runtime, "year": year, "mpaa": certificate, "rating": rating}) # , "director": director, "genre": genre
 
 
 				xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=False)
@@ -295,7 +297,7 @@ def listSeasons(seriesid):
 
 
 
-			li.setInfo(type="video", infoLabels={"title": "Season " + str(count), "plot": cleanString(synopsis.replace("__X__", "\"")), "playcount": playcount })
+			li.setInfo(type="video", infoLabels={"title": "Season " + str(count), "plot": netflixutils.cleanurlstring(synopsis), "playcount": playcount })
 
 			url = sys.argv[0] + "?mode=listepisodes&series=" + seriesid + "&season=" + str(count)
 
@@ -364,9 +366,6 @@ def cleanString(inputstring):
 	for code in htmlCodes:
 		s = s.replace(code[1], code[0])
 
-	
-
-
 	return s
 
 def listSubGenres(genreid):
@@ -383,7 +382,7 @@ def listSubGenres(genreid):
 	match = re.compile("'(.*?)':'(.*?)'", re.DOTALL).findall(content)
 
 	for title, genreid in match:
-		li = xbmcgui.ListItem(cleanString(title))
+		li = xbmcgui.ListItem(netflixutils.cleanurlstring(title))
 		url = sys.argv[0] + "?mode=listgenrevideos&genre=" + genreid
 		xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 

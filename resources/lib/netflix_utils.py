@@ -18,10 +18,39 @@
 
 import os
 import time
+import urllib
 import urllib2
 import xbmc
 
+def cleanurlstring(inputstring):
+	s=inputstring
 
+
+	htmlCodes = (
+		("'", '&#39;'),
+		('"', '&quot;'),
+		('>', '&gt;'),
+		('<', '&lt;'),
+		('&', '&amp;'),
+		('"', '\\"'), 
+
+	)
+
+	for code in htmlCodes:
+		s = s.replace(code[1], code[0])
+
+	y = s
+	y.encode('utf-8')
+	q = y.encode('utf-8')
+	q.decode('utf-8')
+	s = q.decode('unicode_escape') 
+
+	#s = eval("u'%s'" % s).encode('utf-8')
+
+
+
+
+	return s
 
 
 ### make url request wrapper - uses a text file to meter requests so that we don't get blocked by Netflix for scraping.

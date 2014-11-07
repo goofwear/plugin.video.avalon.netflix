@@ -81,7 +81,7 @@ class Main:
 						# write episode data
 						ffilename = "S" + season.zfill(2) + "E" + episode.zfill(2)
 						fh = open (os.path.join(metapath, "titles", sys.argv[3], "Season " + season, ffilename + ".json"), 'w')
-						print match.group()
+						#print match.group()
 						fh.write(match.group())
 						
 						# TODO: Get still image
@@ -116,7 +116,7 @@ class Main:
 						#epcounter += 1
 
 
-
+			thetitle = netflixutils.cleanurlstring(thetitle)
 
 
 
