@@ -49,7 +49,7 @@ class Main:
 
 			#opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(auth.cookiejar))
 			response = netflixutils.makeGetRequest("http://www.netflix.com", auth.cookiejar) # switched to using request metering
-
+			print response
 			#"<li><a href=\"(.*?)WiGenre\\?agid=(.*?)\">(.*?)</a></li>"
 			matches = re.compile("<li><a href=\"(.*?)WiGenre\\?agid=(.*?)\">(.*?)</a></li>", re.DOTALL).findall(response)
 

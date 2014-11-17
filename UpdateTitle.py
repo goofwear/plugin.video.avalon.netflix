@@ -130,7 +130,7 @@ class Main:
 				coverartpath = iconpath
 
 			if(thetitle != ""):
-				xbmc.executebuiltin('Notification("Netflix", "' + thetitle + ' has been updated", 5000, ' + coverartpath + ')')
+				xbmc.executebuiltin(u'Notification("Netflix", "{0} has been updated", 5000, {1})'.format(thetitle, coverartpath))
 			else:
 				xbmc.executebuiltin('Notification("Netflix", "Title updated", 5000, ' + coverartpath + ')')
 
