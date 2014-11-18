@@ -1,3 +1,8 @@
+v 0.2.1
+  + stability fixes in scraper scripts
+  + stability fixes to season data updater
+  + Updated scrapers to provide initial MyList functionality
+
 v 0.2.0
   + updata metadata directly from XBMC UI
   + prompt when metadata is missing or out of date
