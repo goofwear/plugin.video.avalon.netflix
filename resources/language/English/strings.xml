@@ -11,6 +11,8 @@
 	<string id="30010">Metadata</string>
 	<string id="30011">Maximum cache age (days)</string>
 	<string id="30012">Prompt before updating cache?</string>
+	<string id="30013">Maximum MyList age (days)</string>
+	<string id="30014">Prompy before updating MyList?</string>
 
 
 	<!-- Lists start at 30100 -->

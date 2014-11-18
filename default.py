@@ -44,11 +44,16 @@ def index():
 	
 
 	# create plugin list item (MyList)
-	if os.path.isdir(os.path.join(metapath, "MyList")):
-		li = xbmcgui.ListItem(translation(30102))
+	#if os.path.isdir(os.path.join(metapath, "MyList")):
+	li = xbmcgui.ListItem(translation(30102))
 
-		url = sys.argv[0] + "?mode=mylist"
-		xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
+	# add context menu to refresh MyList
+	ctxItms = []
+	ctxItms.append((translation(30113), 'xbmc.runscript(special://home/addons/' + addonID + '/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ')')) # 30111 = Refresh Genres
+	li.addContextMenuItems(ctxItms)
+
+	url = sys.argv[0] + "?mode=mylist"
+	xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 
 	# end of directory listing
 	xbmcplugin.endOfDirectory(pluginhandle)
