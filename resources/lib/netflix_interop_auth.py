@@ -23,7 +23,7 @@ def getAuth():
 
     # build an opener using the global cookiejar
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
-    response = opener.open("https://signup.netflix.com/login").read()
+    response = opener.open("https://www.netflix.com/login").read()
     
     # find matches - should return <input type="hidden" name="authURL" value="[the_value]" /> instances
     match = re.compile('input.*?authURL.*?value="(.*?)"', re.DOTALL).findall(str(response))
