@@ -454,14 +454,38 @@ if os.path.exists(os.path.join(metapath, "Genres", "genres.json")):
 else:
 	UpdateGenres = True
 
+UpdateMyList = False
+if os.path.isdir(os.path.join(metapath, "MyList")):
+	for ffile in os.listdir(os.path.join(metapath,"MyList")):
+		age = xbmcvfs.Stat(os.path.join(metapath, "MyList", ffile)).st_mtime()
+		now = time.time()
+
+		oneday = 24 * 60 * 60
+
+		if (now-age) > (oneday*int(addon.getSetting("mylistage"))):
+			UpdateMyList = True
+else:
+	UpdateMyList = True
+
 if(UpdateGenres):
-	if(addon.getSetting("promptforcache")):
+	if(addon.getSetting("promptforcache") == "true"):
 		dialog = xbmcgui.Dialog()
 		ret = dialog.yesno('Netflix', translation(30200))
 		if(ret):
 			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ')')
 	else:
 		xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ')')
+
+if(UpdateMyList):
+	if(addon.getSetting("promptformylist") == "true"):
+		dialog = xbmcgui.Dialog()
+		ret = dialog.yesno('Netflix', translation(30202))
+		if(ret):
+			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ')')
+
+	else:
+		xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ')')
+
 
 
 if mode == 'listgenres':

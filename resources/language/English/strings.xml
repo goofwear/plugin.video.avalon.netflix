@@ -28,4 +28,5 @@
 	<!-- Dialogs start at 30200 -->
 	<string id="30200">Genre cache has expired. Refresh cache now?</string>
 	<string id="30201">Genre Title cache has expired. Refresh cache now?</string>
+	<string id="30202">MyList data has expired. Refresh MyList now?</string>
 </strings>

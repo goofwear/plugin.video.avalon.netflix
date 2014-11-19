@@ -27,7 +27,10 @@ class Main:
 		content = netflixutils.makeGetRequest("http://www.netflix.com/MyList", auth.cookiejar)
 		expr = "<div class=\"agMovie agMovie-lulg\">.*?<img  .*?src=\"(.*?)\" >.*?<a.*?WiPlayer\\?movieid=(.*?)&trkid=(.*?)&";
 
-		print content
+
+		for ffile in os.listdir(os.path.join(metapath,"MyList")):
+			os.remove(os.path.join(metapath, "MyList", ffile))
+
 
 		matches = re.compile(expr, re.DOTALL).findall(content)
 
