@@ -8,6 +8,7 @@ import time
 import xbmc
 import xbmcaddon
 import xbmcvfs
+import codecs
 
 sys.path.append(os.path.join(xbmc.translatePath('special://home/addons/plugin.video.avalon.netflix/'), "resources", "lib")) 
 
@@ -115,8 +116,8 @@ class Main:
 
 						#epcounter += 1
 
-
 			thetitle = netflixutils.cleanurlstring(thetitle)
+			#tilte = thetitle.decode('ascii', errors='ignore')
 
 
 
@@ -130,7 +131,11 @@ class Main:
 				coverartpath = iconpath
 
 			if(thetitle != ""):
-				xbmc.executebuiltin(u'Notification("Netflix", "{0} has been updated", 5000, {1})'.format(thetitle, coverartpath))
+				#frig it so that encoding errors are effectively ignored
+				try:
+					xbmc.executebuiltin('Notification("Netflix", "{0} has been updated", 5000, {1})'.format(thetitle, coverartpath))
+				except:
+					xbmc.executebuiltin('Notification("Netflix", "Title updated", 5000, ' + coverartpath + ')')
 			else:
 				xbmc.executebuiltin('Notification("Netflix", "Title updated", 5000, ' + coverartpath + ')')
 

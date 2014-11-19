@@ -41,8 +41,8 @@ def cleanurlstring(inputstring):
 
 	y = s
 	y.encode('utf-8')
-	q = y.encode('utf-8')
-	q.decode('utf-8')
+	q = y.encode('ascii')
+	q.decode('ascii')
 	s = q.decode('unicode_escape') 
 
 	#s = eval("u'%s'" % s).encode('utf-8')
