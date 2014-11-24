@@ -19,6 +19,7 @@
 	<string id="30100">Browse Genres</string>
 	<string id="30101">Sub Genres</string>
 	<string id="30102">My List</string>
+	<string id="30103">Search</string>
 
 	<string id="30110">Refresh Genres</string>
 	<string id="30111">Refresh Genre Titles</string>
@@ -29,4 +30,5 @@
 	<string id="30200">Genre cache has expired. Refresh cache now?</string>
 	<string id="30201">Genre Title cache has expired. Refresh cache now?</string>
 	<string id="30202">MyList data has expired. Refresh MyList now?</string>
+	<string id="30203">Enter a Search Query</string>
 </strings>

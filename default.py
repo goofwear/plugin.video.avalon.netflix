@@ -16,6 +16,8 @@ import xbmcvfs
 sys.path.append(os.path.join(xbmc.translatePath('special://home/addons/plugin.video.avalon.netflix/'), "resources", "lib")) 
 
 import netflix_utils as netflixutils # utility methods (incl. request metering)
+import netflix_interop_auth as auth
+
 
 pluginhandle = int(sys.argv[1])
 addon = xbmcaddon.Addon()
@@ -55,8 +57,52 @@ def index():
 	url = sys.argv[0] + "?mode=mylist"
 	xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 
+	li = xbmcgui.ListItem(translation(30103))
+	url = sys.argv[0] + "?mode=search"
+	xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
+
 	# end of directory listing
 	xbmcplugin.endOfDirectory(pluginhandle)
+
+def Search():
+	keyboard = xbmc.Keyboard('', translation(30203))
+	keyboard.doModal()
+	if(keyboard.isConfirmed() and keyboard.getText()):
+		search_string = keyboard.getText().replace(" ", "+")
+		url = "http://www.netflix.com/api/shakti/847d3a0e/instantSearch?term=" + search_string
+		auth.login(addon.getSetting("username"), addon.getSetting("password"))
+		content = netflixutils.makeGetRequest(url, auth.cookiejar)
+
+		print url
+
+		expr = '{"id":(.*?),"title":"(.*?)","availableForED":.*?,"trackId":(.*?),"boxart":"(.*?)"}'
+		searchstring = content[content.index('"galleryVideos":'):]
+
+
+		match = re.compile(expr, re.DOTALL).findall(searchstring)
+
+		for titleid, title, trackid, boxart in match:
+			if not os.path.exists(os.path.join(metapath, 'titles', titleid)):
+				if not os.path.isdir(os.path.join(metapath, "titles", titleid)):
+					os.mkdir(os.path.join(metapath, "titles", titleid))
+
+				xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + titleid + ', ' + trackid  +')')
+
+				coverart = netflixutils.makeGetRequest(boxart, auth.cookiejar)
+
+
+				fh = open(os.path.join(metapath, "titles", titleid, "folder.jpg"), 'wb')
+				fh.write(coverart)
+				fh.close()
+				fh = open(os.path.join(metapath, "titles", titleid, "coverart.jpg"), 'wb')
+				fh.write(coverart)
+				fh.close()
+
+			listTitle(titleid)
+
+		xbmcplugin.endOfDirectory(pluginhandle)
+
+
 
 def myList():
 	if os.path.isdir(os.path.join(metapath, "MyList")):
@@ -504,5 +550,7 @@ elif mode == 'playepisode':
 	playEpisode(videoid, seriesid)
 elif mode == 'mylist':
 	myList()
+elif mode == 'search':
+	Search()
 else:
 	index()
