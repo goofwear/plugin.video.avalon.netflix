@@ -1,3 +1,9 @@
+v 0.2.2
+  + Overridden context menu to hide some "resume" options in context menus
+  + Added Basic Search functionality
+  + Added Basic automation of MyList ipdating
+  + Worked to hide some error messages related to encoding of title information
+
 v 0.2.1
   + stability fixes in scraper scripts
   + stability fixes to season data updater
