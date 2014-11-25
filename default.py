@@ -228,7 +228,7 @@ def listTitle(titleid):
 				# add context menu to refresh genre list
 				ctxItms = []
 				ctxItms.append((translation(30112), 'xbmc.runscript(special://home/addons/' + addonID + '/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + titleid + ', ' + trackid  +')')) # 30112 = Refresh Title
-				li.addContextMenuItems(ctxItms)
+				li.addContextMenuItems(ctxItms, True)
 
 				fh = open(os.path.join(metapath, 'titles', titleid, 'seasonddata.json'), 'r')
 				episodecontent = fh.read()
