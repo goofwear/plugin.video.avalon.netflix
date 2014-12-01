@@ -1,3 +1,4 @@
 meta
 /resources/WinPlayer/BrowserCache
 /BrowserCache
+*.pyo
