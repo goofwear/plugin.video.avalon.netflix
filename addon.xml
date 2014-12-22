@@ -2,6 +2,7 @@
 <addon  id="plugin.video.avalon.netflix" name="Netflix" version="0.2.2" provider-name="avalonprojects.net">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.simplejson" version="2.0.10" />
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>video audio image</provides>

@@ -1,3 +1,7 @@
+v 0.3.0
+  = Refactored to use better JSON parsing and restructure code
+  - Temporarily removed search features
+  
 v 0.2.2
   + Overridden context menu to hide some "resume" options in context menus
   + Added Basic Search functionality
