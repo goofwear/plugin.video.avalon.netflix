@@ -58,12 +58,12 @@ seasonid = urllib.unquote_plus(params.get('seasonid', ''))
 season = urllib.unquote_plus(params.get('season', ''))
 
 # make sure we can login to the Netflix website
-while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
-	d = xbmcgui.Dialog()
-	addon.setSetting("username", d.input(utils.translation(addon, 30004)))
-	addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
-	username = addon.getSetting("username")
-	password = addon.getSetting("password")
+#while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
+#	d = xbmcgui.Dialog()
+#	addon.setSetting("username", d.input(utils.translation(addon, 30004)))
+#	addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
+#	username = addon.getSetting("username")
+#	password = addon.getSetting("password")
 
 cookiejar.save(cookiepath)
 
@@ -81,8 +81,22 @@ if UpdateGenres:
 		dialog = xbmcgui.Dialog()
 		ret = dialog.yesno('Netflix', utils.translation(addon, 30200))
 		if(ret):
+			# make sure we can login to the Netflix website
+			while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
+				d = xbmcgui.Dialog()
+				addon.setSetting("username", d.input(utils.translation(addon, 30004)))
+				addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
+				username = addon.getSetting("username")
+				password = addon.getSetting("password")
 			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ')')
 	else:
+# make sure we can login to the Netflix website
+		while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
+			d = xbmcgui.Dialog()
+			addon.setSetting("username", d.input(utils.translation(addon, 30004)))
+			addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
+			username = addon.getSetting("username")
+			password = addon.getSetting("password")
 		xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ')')
 
 if mode == 'listgenres':
@@ -107,8 +121,22 @@ elif mode == 'listgenretitles':
 			dialog = xbmcgui.Dialog()
 			ret = dialog.yesno('Netflix', utils.translation(addon, 30200))
 			if(ret):
+				# make sure we can login to the Netflix website
+				while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
+					d = xbmcgui.Dialog()
+					addon.setSetting("username", d.input(utils.translation(addon, 30004)))
+					addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
+					username = addon.getSetting("username")
+					password = addon.getSetting("password")
 				xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genre + ',' + genrename + ')')
 		else:
+			# make sure we can login to the Netflix website
+			while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
+				d = xbmcgui.Dialog()
+				addon.setSetting("username", d.input(utils.translation(addon, 30004)))
+				addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
+				username = addon.getSetting("username")
+				password = addon.getSetting("password")
 			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genre + ',' + genrename + ')')
 
 	menus.genreTitles(addon, addonID, pluginhandle, genretitlesmetapath, sys.argv[0], callstackpath, maxrequestsperminute, cookiepath, genre, metaroot)
