@@ -29,7 +29,7 @@ def scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath, cacheag
 		#	genres += ","
 		#genres += "'{0}':'{1}'".format(genrename, genreid)
 		data[utils.cleanstring(genrename)] = genreid
-		print genrename
+		#print genrename
 
 
 		UpdateSubGenres = False
@@ -55,7 +55,7 @@ def scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath, cacheag
 def scrapeSubGenre(cookies, callstackpath, maxrequestsperminute, metapath, url):
 
 	response = utils.makeGetRequest(url, cookies, callstackpath, maxrequestsperminute)
-	print response
+	#print response
 	apimatch = re.compile('\"BUILD_IDENTIFIER\":\"(.*?)\".*?\"SHAKTI_API_ROOT\":\"(.*?)\"', re.DOTALL).findall(response)
 	apiurl = ""
 	for build, root in apimatch:
@@ -110,7 +110,7 @@ def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, ge
 
 		while not content.startswith('{"catalogItems":[]}'):
 			requesturl = apiurl + "/wigenre?genreId=" + genreid + "&full=false&from=" + str(start) + "&to=" + str(start + size)
-			print requesturl
+			#print requesturl
 			# increment for next call
 			start = start + size + 1
 
@@ -132,7 +132,7 @@ def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, ge
 				if not os.path.isdir(os.path.join(metapath, "Titles", titleid)):
 					os.mkdir(os.path.join(metapath, "Titles", titleid))
 
-				print boxart
+				#print boxart
 
 				coverart = utils.makeGetRequest(boxart, cookies, callstackpath, maxrequestsperminute)
 
@@ -238,30 +238,31 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 
 					stillswidth = 0
 					stillspath = ""
-					for still in episode["stills"]:
-						width = still["width"]
-						try:
-							if(int(width) > stillswidth):
-								stillswidth = int(width)
-								stillspath = still["url"]
-						except:
-							pass
+					if "stills" in episode:
+						for still in episode["stills"]:
+							width = still["width"]
+							try:
+								if(int(width) > stillswidth):
+									stillswidth = int(width)
+									stillspath = still["url"]
+							except:
+								pass
 
-					if stillspath != "":
-						try:
-							stillimage = utils.makeGetRequest(stillspath, cookies, callstackpath, maxrequestsperminute)
-							fh = open(os.path.join(metapath, "Titles", titleid, "Season " + str(episode["season"]), fname + ".jpg"), 'wb')
-							fh.write(stillimage)
-							fh.close()
-						except:
-							pass
+						if stillspath != "":
+							try:
+								stillimage = utils.makeGetRequest(stillspath, cookies, callstackpath, maxrequestsperminute)
+								fh = open(os.path.join(metapath, "Titles", titleid, "Season " + str(episode["season"]), fname + ".jpg"), 'wb')
+								fh.write(stillimage)
+								fh.close()
+							except:
+								pass
 
 								#http://www.netflix.com/WiMovie/70297439?actionMethod=seasonDetails&seasonId=70296034&seasonKind=ELECTRONIC
 				seasoninfourl = "http://www.netflix.com" + mdplink + "?&actionMethod=seasonDetails&seasonId=" + str(season[0]["seasonId"]) + "&seasonKind=ELECTRONIC"
 				seasoninforesponse = utils.makeGetRequest(seasoninfourl, cookies, callstackpath, maxrequestsperminute)
 				#print seasoninfourl
 				#print seasoninforesponse
-				print seasoninforesponse
+				#print seasoninforesponse
 				seasoninfo = json.loads(seasoninforesponse)
 				#print seasoninfo["html"]
 				seasoninfosynopsismatch = re.compile('<\/h2><p class=\"synopsis\".*?>(.*?)<\/p>', re.DOTALL).findall(seasoninfo["html"])

@@ -19,7 +19,9 @@ def index(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxre
 	li = xbmcgui.ListItem(utils.translation(addon,30100))
 	ctxitms = []
 	
-	ctxitms.append((utils.translation(addon, 30111), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metapath + ')'))
+	#xbmc.executebuiltin('Container.Update(' + sys.argv[0] + '?mode=updategenretitles&genre=' + genre + '&genrename=' + genrename + ')')
+	ctxitms.append((utils.translation(addon, 30110), 'Container.Update(' + viewpath + '?mode=updategenres)', ))
+	#ctxitms.append((utils.translation(addon, 30111), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metapath + ')'))
 
 	li.addContextMenuItems(ctxitms)
 	url = sys.argv[0] + '?mode=listgenres'
@@ -55,11 +57,12 @@ def genres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxr
 			li = xbmcgui.ListItem(title)
 			ctxitms = []
 			ctxitms.append((utils.translation(addon, 30101), 'Container.Update(' + viewpath + '?mode=listsubgenres&genre=' + genres[title] + ')', ))
+			ctxitms.append((utils.translation(addon, 30111), 'Container.Update(' + viewpath + '?mode=updategenretitles&genre=' + genres[title] + '&genrename=' + title + ')', ))
 			li.addContextMenuItems(ctxitms)
 			url = viewpath + '?mode=listgenretitles&genre=' + genres[title] + "&genrename=" + urllib.quote_plus(title)
 			xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 
-			print url
+			#print url
 	if itemcount >= 1:
 		xbmcplugin.endOfDirectory(pluginhandle)
 
@@ -153,7 +156,7 @@ def seasons(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, max
 
 
 			info = {'plot': syno, 'year': int(year)}
-			print info
+			#print info
 
 			li.setInfo('video', infoLabels=info)
 
