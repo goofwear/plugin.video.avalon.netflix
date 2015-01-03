@@ -136,8 +136,9 @@ def seasons(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, max
 			for episode in season:
 				#episodeexpr = '{"title":".*?","season":(.*?),"seasonYear":.*?,"episode":.*?,"synopsis":".*?","seasonId":.*?,"episodeId":.*?,"videoId":.*?,"nonMemberViewable":.*?,"runtime":(.*?),"availableForED":.*?,"availabilityMessage":.*?,"stills":\[.*?\],"bookmarkPosition":(.*?),"lastModified":".*?"}'
 				episodecount += 1
-				if float(episode["bookmarkPosition"])/float(episode["runtime"]) >= 0.9:
-					watched += 1
+				if episode["bookmarkPosition"]:
+					if float(episode["bookmarkPosition"])/float(episode["runtime"]) >= 0.9:
+						watched += 1
 				year = episode["seasonYear"]
 
 			li = xbmcgui.ListItem(title)

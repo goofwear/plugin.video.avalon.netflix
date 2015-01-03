@@ -1,6 +1,7 @@
 v 0.3.2
   + Update title functionality
   = Fixed incorrect watch state on fully watched episodes
+  = Fixed filename issue in season data updater
 
 v 0.3.1
   + stability improvements for scraper scripts
