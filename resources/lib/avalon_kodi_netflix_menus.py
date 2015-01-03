@@ -103,7 +103,7 @@ def genreTitles(addon, addonID, pluginhandle, metapath, viewpath, callstackpath,
 	if content != "":
 		titles = json.loads(content)
 		for title in titles:
-			listTitle(title["titleId"], viewpath, pluginhandle, metaroot)
+			listTitle(title["titleId"], viewpath, pluginhandle, metaroot, addon)
 			itemcount += 1
 
 	if itemcount >= 1:
@@ -186,10 +186,14 @@ def episodes(addon, addonid, pluginhandle, metapath, viewpath, callstackpath, ma
 					url = viewpath + "?mode=playepisode&title=" + str(episode["episodeId"]) + "&series=" + str(episode["videoId"])
 					li = xbmcgui.ListItem(str(episode["episode"]).zfill(2) + ". " + episode["title"])
 					li.setProperty('TotalTime', str(episode["runtime"]))
-					li.setProperty('ResumeTime', str(episode["bookmarkPosition"]))
+					playcount = 0
+					if(episode["runtime"] != episode["bookmarkPosition"]):
+						li.setProperty('ResumeTime', str(episode["bookmarkPosition"]))
+					elif(episode["bookmarkPosition"] != 0):
+						playcount = 1
 
 					synopsis = episode["synopsis"]
-					info = {'plot': synopsis, 'season': episode["season"], 'episode': episode["episode"], 'tvshowtitle': seriesdata["title"], 'title': episode["title"]}
+					info = {'plot': synopsis, 'season': episode["season"], 'episode': episode["episode"], 'tvshowtitle': seriesdata["title"], 'title': episode["title"], 'playcount': playcount}
 
 					li.setInfo('video', infoLabels = info)
 
@@ -200,17 +204,17 @@ def episodes(addon, addonid, pluginhandle, metapath, viewpath, callstackpath, ma
 
 		xbmcplugin.endOfDirectory(pluginhandle)
 
-def myList(viewpath, pluginhandle, metaroot):
+def myList(viewpath, pluginhandle, metaroot, addon):
 	if os.path.isdir(os.path.join(metaroot, "MyList")):
 		for ffile in os.listdir(os.path.join(metaroot,"MyList")):
 			try:
-				listTitle(ffile, viewpath, pluginhandle, metaroot)
+				listTitle(ffile, viewpath, pluginhandle, metaroot, addon)
 			except:
 				pass
 			
 		xbmcplugin.endOfDirectory(pluginhandle)
 
-def listTitle(titleid, viewpath, pluginhandle, metaroot):
+def listTitle(titleid, viewpath, pluginhandle, metaroot, addon):
 	metapath = os.path.join(metaroot, "Titles", titleid)
 	if os.path.exists(metapath):
 		datafile = os.path.join(metapath, "meta.json")
@@ -228,8 +232,14 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot):
 		li = xbmcgui.ListItem(data["title"], iconImage = thumbfile, thumbnailImage = thumbfile)
 		ctxItems = []
 
+		ctxItems.append((utils.translation(addon, 30112), 'Container.Update(' + viewpath + '?mode=updatetitle&title=' + titleid + '&track=' + str(data["trackId"]) + ')', ))
+		
+		li.addContextMenuItems(ctxItems)
 
 		genres = ""
+
+
+
 		if os.path.isdir(os.path.join(metapath, "Genres")):
 			for ffile in os.listdir(os.path.join(metapath,"Genres")):
 				if genres != "":

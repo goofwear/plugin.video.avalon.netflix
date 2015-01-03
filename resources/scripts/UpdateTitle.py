@@ -46,13 +46,13 @@ class Main:
 		#def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, genreid):
 
 
-
+		#def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid, trackid):
 		scraper.scrapeTitle(cookies, sys.argv[5], sys.argv[6], sys.argv[8], sys.argv[9], sys.argv[10])
 		#scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath):
 
 
-		xbmc.executebuiltin('Notification("Netflix", "Titles Updated", 5000, ' + iconpath + ')')
-		print 'done'
+		xbmc.executebuiltin('Notification("Netflix", "Title Updated", 5000, ' + iconpath + ')')
+		
 
 	def ensureFolders(self):
 		metapath = xbmc.translatePath('special://profile/addon_data/' + sys.argv[7] + '/meta')
@@ -64,5 +64,7 @@ class Main:
 			os.mkdir(os.path.join(metapath, "Genres"))
 		if not os.path.isdir(os.path.join(metapath, "Titles")):
 			os.mkdir(os.path.join(metapath, "Titles"))
+
+
 
 Main()

@@ -56,6 +56,7 @@ videoid = urllib.unquote_plus(params.get('title',''))
 seriesid = urllib.unquote_plus(params.get('series',''))
 seasonid = urllib.unquote_plus(params.get('seasonid', ''))
 season = urllib.unquote_plus(params.get('season', ''))
+track = urllib.unquote_plus(params.get('track',''))
 
 # make sure we can login to the Netflix website
 #while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
@@ -167,5 +168,17 @@ elif mode == 'updategenretitles':
 		password = addon.getSetting("password")
 	print maxrequestsperminute
 	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genre + ',' + genrename + ')')
+elif mode == 'updatetitle':
+
+	while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
+		d = xbmcgui.Dialog()
+		addon.setSetting("username", d.input(utils.translation(addon, 30004)))
+		addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
+		username = addon.getSetting("username")
+		password = addon.getSetting("password")	
+
+	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid + ', ' + track + ')')
+	#print 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid
+
 else:
 	menus.index(addon, addonID, pluginhandle, metaroot, sys.argv[0], callstackpath, maxrequestsperminute, cookiepath);
