@@ -188,10 +188,14 @@ def episodes(addon, addonid, pluginhandle, metapath, viewpath, callstackpath, ma
 					li = xbmcgui.ListItem(str(episode["episode"]).zfill(2) + ". " + episode["title"])
 					li.setProperty('TotalTime', str(episode["runtime"]))
 					playcount = 0
-					if(episode["runtime"] != episode["bookmarkPosition"]):
-						li.setProperty('ResumeTime', str(episode["bookmarkPosition"]))
-					elif(episode["bookmarkPosition"] != 0):
+					#if(episode["runtime"] != episode["bookmarkPosition"]):
+					#	li.setProperty('ResumeTime', str(episode["bookmarkPosition"]))
+					#elif(episode["bookmarkPosition"] != 0):
+					#	playcount = 1
+					if float(episode["bookmarkPosition"])/float(episode["runtime"]) >= 0.9:
 						playcount = 1
+					elif(episode["runtime"] != episode["bookmarkPosition"]):
+						li.setProperty('ResumeTime', str(episode["bookmarkPosition"]))
 
 					synopsis = episode["synopsis"]
 					info = {'plot': synopsis, 'season': episode["season"], 'episode': episode["episode"], 'tvshowtitle': seriesdata["title"], 'title': episode["title"], 'playcount': playcount}
