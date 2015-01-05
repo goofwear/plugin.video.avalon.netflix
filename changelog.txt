@@ -1,3 +1,6 @@
+v 0.3.3
+  = Minor changes to determine episode watch status
+
 v 0.3.2
   + Update title functionality
   = Fixed incorrect watch state on fully watched episodes
