@@ -14,11 +14,11 @@ import xbmcplugin
 import avalon_kodi_utils as utils
 
 def index(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath):
-	
+
 	# create plugin list item (Browse Genres)
 	li = xbmcgui.ListItem(utils.translation(addon,30100))
 	ctxitms = []
-	
+
 	#xbmc.executebuiltin('Container.Update(' + sys.argv[0] + '?mode=updategenretitles&genre=' + genre + '&genrename=' + genrename + ')')
 	ctxitms.append((utils.translation(addon, 30110), 'Container.Update(' + viewpath + '?mode=updategenres)', ))
 	#ctxitms.append((utils.translation(addon, 30111), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metapath + ')'))
@@ -51,7 +51,7 @@ def genres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxr
 	itemcount = 0
 	if content != "":
 		genres = json.loads(content, object_pairs_hook = collections.OrderedDict)
-		
+
 		for title in genres:
 			itemcount += 1
 			li = xbmcgui.ListItem(title)
@@ -79,7 +79,7 @@ def subGenres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, m
 	itemcount = 0
 	if content != "":
 		genres = json.loads(content, object_pairs_hook = collections.OrderedDict)
-		
+
 		for title in genres:
 			itemcount += 1
 			li = xbmcgui.ListItem(title)
@@ -216,7 +216,7 @@ def myList(viewpath, pluginhandle, metaroot, addon):
 				listTitle(ffile, viewpath, pluginhandle, metaroot, addon)
 			except:
 				pass
-			
+
 		xbmcplugin.endOfDirectory(pluginhandle)
 
 def listTitle(titleid, viewpath, pluginhandle, metaroot, addon):
@@ -238,7 +238,7 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot, addon):
 		ctxItems = []
 
 		ctxItems.append((utils.translation(addon, 30112), 'Container.Update(' + viewpath + '?mode=updatetitle&title=' + titleid + '&track=' + str(data["trackId"]) + ')', ))
-		
+
 		li.addContextMenuItems(ctxItems)
 
 		genres = ""
@@ -273,10 +273,12 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot, addon):
 					for episode in season:
 						#episodeexpr = '{"title":".*?","season":(.*?),"seasonYear":.*?,"episode":.*?,"synopsis":".*?","seasonId":.*?,"episodeId":.*?,"videoId":.*?,"nonMemberViewable":.*?,"runtime":(.*?),"availableForED":.*?,"availabilityMessage":.*?,"stills":\[.*?\],"bookmarkPosition":(.*?),"lastModified":".*?"}'
 						episodecount += 1
-						if float(episode["bookmarkPosition"])/float(episode["runtime"]) >= 0.9:
-							watched += 1
+						try:
+							if float(episode["bookmarkPosition"])/float(episode["runtime"]) >= 0.9:
+								watched += 1
+						except:
+							pass
 
-				
 				if (episodecount - watched) == 0:
 					playcount = 1
 				elif watched == 0:
@@ -335,4 +337,3 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot, addon):
 #        - dateadded : string (Y-m-d h:m:s = 2009-04-05 23:16:04)
 
 		xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=isfolder)
-
