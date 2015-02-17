@@ -148,7 +148,9 @@ elif mode == 'playepisode':
 	subprocess.Popen(playerpath + ' /movieid=' + videoid + ' /seriesid=' + seriesid + ' /savepath=' + os.path.join(metaroot, "titles", seriesid) + ' /un=' + username + ' /pw=' + password, shell=False)
 
 elif mode == 'mylist':
-	menus.myList(sys.argv[0], pluginhandle, metaroot)
+	#myList(viewpath, pluginhandle, metaroot, addon):
+	menus.myList(sys.argv[0], pluginhandle, metaroot, addon)
+
 elif mode == 'updategenres':
 	# make sure we can login to the Netflix website
 	while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
@@ -175,7 +177,7 @@ elif mode == 'updatetitle':
 		addon.setSetting("username", d.input(utils.translation(addon, 30004)))
 		addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
 		username = addon.getSetting("username")
-		password = addon.getSetting("password")	
+		password = addon.getSetting("password")
 
 	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid + ', ' + track + ')')
 	#print 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid
