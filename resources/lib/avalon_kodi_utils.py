@@ -38,7 +38,7 @@ def cleanstring(inputstring):
 		('>', '&gt;'),
 		('<', '&lt;'),
 		('&', '&amp;'),
-		('"', '\\"'), 
+		('"', '\\"'),
 
 	)
 
@@ -49,7 +49,7 @@ def cleanstring(inputstring):
 	y.encode('utf-8')
 	q = y.encode('ascii')
 	q.decode('ascii')
-	s = q.decode('unicode_escape') 
+	s = q.decode('unicode_escape')
 
 	#s = eval("u'%s'" % s).encode('utf-8')
 
@@ -89,7 +89,7 @@ def makeGetRequest(url, cookies, callstackpath, maxcalls):
 #			except:
 #				makeGetRequest(url, cookies, callstackpath, maxcalls)
 #
-#			
+#
 #			if len(lines) <= maxcalls:
 #				print str(len(lines)) + ":" + str(maxcalls)
 #				doit = True
@@ -147,7 +147,7 @@ def makeGetRequest(url, cookies, callstackpath, maxcalls):
 					# check if the timestamp of the row is older than a minute
 					if float(line) + 60 <  time.time():
 						lines.remove(line) # remove old lines
-						
+
 					# update the metering file
 
 				except:
@@ -218,6 +218,7 @@ def _doGetRequest(url, cookies, callstackpath, lines):
 
 	# make the request and return the response!!!
 	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
+	opener.addheaders = [("Accept-Language", "en-US,en;q=0.5"),  ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"), ("Connection", "keep-alive")]
 	return opener.open(url).read()
 	#except Exception, Argument:
 		#print "Netflix FileLock encountered - trying again "

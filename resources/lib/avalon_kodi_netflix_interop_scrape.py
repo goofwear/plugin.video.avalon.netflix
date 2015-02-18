@@ -13,7 +13,7 @@ import avalon_kodi_netflix_interop_auth as auth
 import avalon_kodi_utils as utils
 
 def scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath, cacheage):
-	
+
 	response = utils.makeGetRequest('http://www.netflix.com', cookies, callstackpath, maxrequestsperminute)
 	matches = re.compile("<li><a href=\"(.*?)WiGenre\\?agid=(.*?)\">(.*?)</a></li>", re.DOTALL).findall(response)
 
@@ -22,7 +22,7 @@ def scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath, cacheag
 	genres = ""
 	data = collections.OrderedDict()
 	for url, genreid, genrename in matches:
-		
+
 		url = url + "WiGenre?agid=" + genreid
 
 		#if genres != "":
@@ -169,7 +169,7 @@ def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, ge
 
 				titles = titles + [titledata]
 
-			
+
 
 		fh = open(os.path.join(metapath, "genreTitles", genreid + ".json"), 'w')
 		fh.write(json.dumps(titles))
@@ -279,17 +279,26 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 
 def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 	#def makeGetRequest(url, cookies, callstackpath, maxcalls):
-	content = utils.makeGetRequest("http://www.netflix.com/MyList", cookies, callstackpath, maxrequestsperminute)
-	expr = "<div class=\"agMovie agMovie-lulg\">.*?<img  .*?src=\"(.*?)\" >.*?<a.*?WiPlayer\\?movieid=(.*?)&trkid=(.*?)&";
+	content = utils.makeGetRequest("https://www.netflix.com/MyList", cookies, callstackpath, maxrequestsperminute)
+	#expr = "<div.*?class=\"agMovie agMovie-lulg\".*?<img.*?src=\"(.*?)\".*?>.*?<a.*?WiPlayer\\?movieid=(.*?)&trkid=(.*?)&";
+	expr = '<div class="agMovie agMovie-lulg">.*?<img.*?src="(.*?)" ><a .*? href=".*?WiPlayer\\?movieid=(.*?)&trkid=(.*?)&'
+	#content = content.decode('utf-8')
 
+	if '<div id="yui-main">' in content:
+		content = content[content.index('<div id="yui-main">'):]
+		print 'xxx'
+
+
+	#print content
 
 	for ffile in os.listdir(os.path.join(metapath,"MyList")):
 		os.remove(os.path.join(metapath, "MyList", ffile))
 
 	matches = re.compile(expr, re.DOTALL).findall(content)
-
+	print matches
 	counter = 0
 	for boxart, titleid, trackid in matches:
+		print boxart
 		counter += 1
 		fh = open(os.path.join(metapath, "MyList", titleid), 'w')
 		fh.write(str(counter))
@@ -336,4 +345,3 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 # 10 TrackID
 #		if UpdateTitle:
 #			xbmc.executebuiltin('xbmc.runscript(special://home/addons/plugin.video.avalon.netflix/UpdateTitle.py, ' + sys.argv[1] + ', ' + sys.argv[2] + ', ' + titleid + ', ' + trackid + ')')
-
