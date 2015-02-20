@@ -68,6 +68,11 @@ track = urllib.unquote_plus(params.get('track',''))
 
 cookiejar.save(cookiepath)
 
+# clear any active states
+if os.path.exists(os.path.join(metaroot, "active", "scrape_mylist")):
+	os.remove(os.path.join(metapath, "active", "scrape_mylist"))
+
+
 # check that the basic meta cache has been saved and has not expired
 UpdateGenres = False
 if os.path.exists(os.path.join(metaroot, "Genres", "genres.json")):
@@ -76,6 +81,20 @@ if os.path.exists(os.path.join(metaroot, "Genres", "genres.json")):
 		UpdateGenres = True
 else:
 	UpdateGenres = True
+
+UpdateMyList = False
+if os.path.isdir(os.path.join(metaroot, "MyList")):
+	oneday = 24 * 60 * 60
+	for ffile in os.listdir(os.path.join(metaroot, "MyList")):
+		if utils.fileIsOlderThan(os.path.join(metaroot, "MyList", ffile), (oneday * int(addon.getSetting("mylistage")))):
+			UpdateMyList = True
+else:
+	UpdateMyList = True
+
+if os.path.exists(os.path.join(metaroot, "active", "scrape_mylist")):
+	UpdateMyList = False
+
+print UpdateMyList
 
 if UpdateGenres:
 	if addon.getSetting("promptforcache") == "true":
@@ -92,6 +111,23 @@ if UpdateGenres:
 			xbmc.executebuiltin('Container.Update(' + sys.argv[0] + '?mode=updategenres)')
 	else:
 		xbmc.executebuiltin('Container.Update(' + sys.argv[0] + '?mode=updategenres)')
+
+if UpdateMyList:
+	if addon.getSetting("promptformylist") == "true":
+		dialog = xbmcgui.Dialog()
+		ret = dialog.yesno('Netflix', utils.translation(addon, 30202))
+		if ret:
+			# make sure we can login to the Netflix website
+			while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
+				d = xbmcgui.Dialog()
+				addon.setSetting("username", d.input(utils.translation(addon, 30004)))
+				addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
+				username = addon.getSetting("username")
+				password = addon.getSetting("password")
+			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ')')
+	else:
+		xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ')')
+
 
 if mode == 'listgenres':
 	#def genres(addon, addonID, pluginhandle, metapath, viewpath):
@@ -181,6 +217,13 @@ elif mode == 'updatetitle':
 
 	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid + ', ' + track + ')')
 	#print 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid
-
+elif mode == 'updatemylist':
+	while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
+		d = xbmcgui.Dialog()
+		addon.setSetting("username", d.input(utils.translation(addon, 30004)))
+		addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
+		username = addon.getSetting("username")
+		password = addon.getSetting("password")
+	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ')')
 else:
 	menus.index(addon, addonID, pluginhandle, metaroot, sys.argv[0], callstackpath, maxrequestsperminute, cookiepath);

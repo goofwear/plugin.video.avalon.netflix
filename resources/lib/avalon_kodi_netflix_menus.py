@@ -29,7 +29,8 @@ def index(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxre
 
 	li = xbmcgui.ListItem(utils.translation(addon,30102))
 	ctxitms = []
-	ctxitms.append((utils.translation(addon, 30113), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metapath + ')'))
+	#ctxitms.append((utils.translation(addon, 30113), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metapath + ')'))
+	ctxitms.append((utils.translation(addon, 30113), 'Container.Update(' + viewpath + '?mode=updatemylist)', ))
 
 	li.addContextMenuItems(ctxitms)
 	url = sys.argv[0] + '?mode=mylist'

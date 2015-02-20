@@ -278,61 +278,72 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 		xbmc.executebuiltin('Notification("Netflix", "' + thetitle.encode('utf-8') + ' has been updated", 5000, ' + iconpath + ')')
 
 def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
-	#def makeGetRequest(url, cookies, callstackpath, maxcalls):
-	content = utils.makeGetRequest("https://www.netflix.com/MyList", cookies, callstackpath, maxrequestsperminute)
-	#expr = "<div.*?class=\"agMovie agMovie-lulg\".*?<img.*?src=\"(.*?)\".*?>.*?<a.*?WiPlayer\\?movieid=(.*?)&trkid=(.*?)&";
-	expr = '<div class="agMovie agMovie-lulg">.*?<img.*?src="(.*?)" ><a .*? href=".*?WiPlayer\\?movieid=(.*?)&trkid=(.*?)&'
-	#content = content.decode('utf-8')
 
-	if '<div id="yui-main">' in content:
-		content = content[content.index('<div id="yui-main">'):]
-		print 'xxx'
+	if not os.path.isdir(os.path.join(metapath, "active")):
+		os.mkdir(os.path.join(metapath, "active"))
 
+	if not os.path.exists(os.path.join(metapath, "active", "scrape_mylist")):
 
-	#print content
-
-	for ffile in os.listdir(os.path.join(metapath,"MyList")):
-		os.remove(os.path.join(metapath, "MyList", ffile))
-
-	matches = re.compile(expr, re.DOTALL).findall(content)
-	print matches
-	counter = 0
-	for boxart, titleid, trackid in matches:
-		print boxart
-		counter += 1
-		fh = open(os.path.join(metapath, "MyList", titleid), 'w')
-		fh.write(str(counter))
+		fh = open(os.path.join(metapath, "active", "scrape_mylist"), 'w')
+		fh.write("currently scraping MyList")
 		fh.close()
 
-		titlefile = os.path.join(metapath, 'Titles', titleid, 'meta.json')
-		coverart = utils.makeGetRequest(boxart, cookies, callstackpath, maxrequestsperminute)
-		if not os.path.isdir(os.path.join(metapath, "Titles", titleid)):
-			os.mkdir(os.path.join(metapath, "Titles", titleid))
+		#def makeGetRequest(url, cookies, callstackpath, maxcalls):
+		content = utils.makeGetRequest("https://www.netflix.com/MyList", cookies, callstackpath, maxrequestsperminute)
+		#expr = "<div.*?class=\"agMovie agMovie-lulg\".*?<img.*?src=\"(.*?)\".*?>.*?<a.*?WiPlayer\\?movieid=(.*?)&trkid=(.*?)&";
+		expr = '<div class="agMovie agMovie-lulg">.*?<img.*?src="(.*?)" ><a .*? href=".*?WiPlayer\\?movieid=(.*?)&trkid=(.*?)&'
+		#content = content.decode('utf-8')
 
-		fh = open(os.path.join(metapath, "Titles", titleid, "folder.jpg"), 'wb')
-		fh.write(coverart)
-		fh.close()
-		fh = open(os.path.join(metapath, "Titles", titleid, "coverart.jpg"), 'wb')
-		fh.write(coverart)
-		fh.close()
+		if '<div id="yui-main">' in content:
+			content = content[content.index('<div id="yui-main">'):]
+			print 'xxx'
 
-		if os.path.exists(os.path.join(metapath, "Titles", titleid, "coverart.jpg")):
-			iconpath = os.path.join(metapath, "Titles", titleid, "coverart.jpg")
-		else:
-			iconpath = ""
 
-		UpdateTitle = False
-		if os.path.exists(titlefile):
-			age = xbmcvfs.Stat(titlefile).st_mtime()
-			now = time.time()
+		#print content
 
-			oneday = 24 * 60 * 60
+			for ffile in os.listdir(os.path.join(metapath,"MyList")):
+				os.remove(os.path.join(metapath, "MyList", ffile))
 
-			if (now-age) > (oneday*int(sys.argv[3])):
-				UpdateTitle = True
-		else:
-			UpdateTitle = True
+			matches = re.compile(expr, re.DOTALL).findall(content)
+			print matches
+			counter = 0
+			for boxart, titleid, trackid in matches:
+				print boxart
+				counter += 1
+				fh = open(os.path.join(metapath, "MyList", titleid), 'w')
+				fh.write(str(counter))
+				fh.close()
 
+				titlefile = os.path.join(metapath, 'Titles', titleid, 'meta.json')
+				coverart = utils.makeGetRequest(boxart, cookies, callstackpath, maxrequestsperminute)
+				if not os.path.isdir(os.path.join(metapath, "Titles", titleid)):
+					os.mkdir(os.path.join(metapath, "Titles", titleid))
+
+				fh = open(os.path.join(metapath, "Titles", titleid, "folder.jpg"), 'wb')
+				fh.write(coverart)
+				fh.close()
+				fh = open(os.path.join(metapath, "Titles", titleid, "coverart.jpg"), 'wb')
+				fh.write(coverart)
+				fh.close()
+
+				if os.path.exists(os.path.join(metapath, "Titles", titleid, "coverart.jpg")):
+					iconpath = os.path.join(metapath, "Titles", titleid, "coverart.jpg")
+				else:
+					iconpath = ""
+
+				UpdateTitle = False
+				if os.path.exists(titlefile):
+					age = xbmcvfs.Stat(titlefile).st_mtime()
+					now = time.time()
+
+					oneday = 24 * 60 * 60
+
+					if (now-age) > (oneday*int(sys.argv[3])):
+						UpdateTitle = True
+				else:
+					UpdateTitle = True
+
+		os.remove(os.path.join(metapath, "active", "scrape_mylist"))
 # 1 UserName
 # 2 Password
 # 3 CacheAge
