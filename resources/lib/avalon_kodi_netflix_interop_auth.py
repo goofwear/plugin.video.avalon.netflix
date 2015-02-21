@@ -9,7 +9,7 @@ import avalon_kodi_utils as utils
 def getAuth(cookies, callstackpath, maxcalls):
 
 	# use utils to make the GET request
-	response = utils.makeGetRequest("http://www.netflix.com/login", cookies, callstackpath, maxcalls)
+	response = utils.makeGetRequest("https://www.netflix.com/login", cookies, callstackpath, maxcalls)
 
 	# find matches - should return <input type="hidden" name="authURL" value="[the_value]" /> instances
 	match = re.compile('input.*?authURL.*?value="(.*?)"', re.DOTALL).findall(str(response))

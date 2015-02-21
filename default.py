@@ -70,7 +70,8 @@ cookiejar.save(cookiepath)
 
 # clear any active states
 if os.path.exists(os.path.join(metaroot, "active", "scrape_mylist")):
-	os.remove(os.path.join(metapath, "active", "scrape_mylist"))
+	for ffile in os.listdir(os.path.join(metaroot,"active")):
+		os.remove(os.path.join(metaroot, "active", ffile))
 
 
 # check that the basic meta cache has been saved and has not expired
@@ -81,6 +82,9 @@ if os.path.exists(os.path.join(metaroot, "Genres", "genres.json")):
 		UpdateGenres = True
 else:
 	UpdateGenres = True
+
+if os.path.exists(os.path.join(metaroot, "active", "scrape_genres")):
+	UpdateGenres = False
 
 UpdateMyList = False
 if os.path.isdir(os.path.join(metaroot, "MyList")):
@@ -152,10 +156,10 @@ elif mode == 'listgenretitles':
 			ret = dialog.yesno('Netflix', utils.translation(addon, 30200))
 			if(ret):
 				# make sure we can login to the Netflix website
-				xbmc.executebuiltin('Container.Update(' + sys.argv[0] + '?mode=updategenretitles&genre=' + genre + '&genrename=' + genrename + ')')
+				xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ')')
 		else:
 			# make sure we can login to the Netflix website
-			xbmc.executebuiltin('Container.Update(' + sys.argv[0] + '?mode=updategenretitles&genre=' + genre + '&genrename=' + genrename + ')')
+			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ')')
 
 	menus.genreTitles(addon, addonID, pluginhandle, genretitlesmetapath, sys.argv[0], callstackpath, maxrequestsperminute, cookiepath, genre, metaroot)
 elif mode == 'listseasons':

@@ -14,43 +14,54 @@ import avalon_kodi_utils as utils
 
 def scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath, cacheage):
 
-	response = utils.makeGetRequest('http://www.netflix.com', cookies, callstackpath, maxrequestsperminute)
-	matches = re.compile("<li><a href=\"(.*?)WiGenre\\?agid=(.*?)\">(.*?)</a></li>", re.DOTALL).findall(response)
+	if not os.path.isdir(os.path.join(metapath, "active")):
+		os.mkdir(os.path.join(metapath, "active"))
 
-	genrefile = os.path.join(metapath, "genres", "genres.json")
+	if not os.path.exists(os.path.join(metapath, "active", "scrape_genres")):
 
-	genres = ""
-	data = collections.OrderedDict()
-	for url, genreid, genrename in matches:
+		fh = open(os.path.join(metapath, "active", "scrape_genres"), 'w')
+		fh.write("currently scraping Genres")
+		fh.close()
 
-		url = url + "WiGenre?agid=" + genreid
+		response = utils.makeGetRequest('http://www.netflix.com', cookies, callstackpath, maxrequestsperminute)
+		matches = re.compile("<li><a href=\"(.*?)WiGenre\\?agid=(.*?)\">(.*?)</a></li>", re.DOTALL).findall(response)
+
+		genrefile = os.path.join(metapath, "genres", "genres.json")
+
+		genres = ""
+		data = collections.OrderedDict()
+		for url, genreid, genrename in matches:
+
+			url = url + "WiGenre?agid=" + genreid
+
+			#if genres != "":
+			#	genres += ","
+			#genres += "'{0}':'{1}'".format(genrename, genreid)
+			data[utils.cleanstring(genrename)] = genreid
+			#print genrename
+
+
+			UpdateSubGenres = False
+			if os.path.exists(os.path.join(metapath, "Genres", genreid + ".json")):
+				oneday = 24 * 60 * 60
+				if utils.fileIsOlderThan(os.path.join(metapath, "Genres", genreid + ".json"), (oneday * int(cacheage))):
+					UpdateSubGenres = True
+			else:
+				UpdateSubGenres = True
+
+			if(UpdateSubGenres):
+				scrapeSubGenre(cookies, callstackpath, maxrequestsperminute, metapath, url)
+
 
 		#if genres != "":
-		#	genres += ","
-		#genres += "'{0}':'{1}'".format(genrename, genreid)
-		data[utils.cleanstring(genrename)] = genreid
-		#print genrename
+		if len(data) > 0:
+			#genres = "{" + genres + "}"
+			genres = json.dumps(data)
+			fh = open(genrefile, 'w')
+			fh.write(genres)
+			fh.close()
 
-
-		UpdateSubGenres = False
-		if os.path.exists(os.path.join(metapath, "Genres", genreid + ".json")):
-			oneday = 24 * 60 * 60
-			if utils.fileIsOlderThan(os.path.join(metapath, "Genres", genreid + ".json"), (oneday * int(cacheage))):
-				UpdateSubGenres = True
-		else:
-			UpdateSubGenres = True
-
-		if(UpdateSubGenres):
-			scrapeSubGenre(cookies, callstackpath, maxrequestsperminute, metapath, url)
-
-
-	#if genres != "":
-	if len(data) > 0:
-		#genres = "{" + genres + "}"
-		genres = json.dumps(data)
-		fh = open(genrefile, 'w')
-		fh.write(genres)
-		fh.close()
+		os.remove(os.path.join(metapath, "active", "scrape_genres"))
 
 def scrapeSubGenre(cookies, callstackpath, maxrequestsperminute, metapath, url):
 
@@ -296,7 +307,6 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 
 		if '<div id="yui-main">' in content:
 			content = content[content.index('<div id="yui-main">'):]
-			print 'xxx'
 
 
 		#print content
