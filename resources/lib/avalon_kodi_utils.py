@@ -24,6 +24,7 @@ def fileIsOlderThan(filepath, maxage):
 	oneday = 24 * 60 * 60
 
 	if((now - age) > (maxage)):
+		#print str(maxage) + ":" + str(age) + ":" + str(now) + ":" + str(now - age)
 		return True
 	else:
 		return False

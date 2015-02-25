@@ -295,9 +295,13 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 
 	if not os.path.exists(os.path.join(metapath, "active", "scrape_mylist")):
 
+
+
 		fh = open(os.path.join(metapath, "active", "scrape_mylist"), 'w')
 		fh.write("currently scraping MyList")
 		fh.close()
+
+
 
 		#def makeGetRequest(url, cookies, callstackpath, maxcalls):
 		content = utils.makeGetRequest("https://www.netflix.com/MyList", cookies, callstackpath, maxrequestsperminute)
@@ -305,11 +309,13 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 		expr = '<div class="agMovie agMovie-lulg">.*?<img.*?src="(.*?)" ><a .*? href=".*?WiPlayer\\?movieid=(.*?)&trkid=(.*?)&'
 		#content = content.decode('utf-8')
 
+
 		if '<div id="yui-main">' in content:
 			content = content[content.index('<div id="yui-main">'):]
 
+			print 'gotMyListContent'
 
-		#print content
+			#print content
 
 			for ffile in os.listdir(os.path.join(metapath,"MyList")):
 				os.remove(os.path.join(metapath, "MyList", ffile))

@@ -192,7 +192,7 @@ def episodes(addon, addonid, pluginhandle, metapath, viewpath, callstackpath, ma
 					#if(episode["runtime"] != episode["bookmarkPosition"]):
 					#	li.setProperty('ResumeTime', str(episode["bookmarkPosition"]))
 					#elif(episode["bookmarkPosition"] != 0):
-					#	playcount = 1
+					#	playcount =
 					if float(episode["bookmarkPosition"])/float(episode["runtime"]) >= 0.9:
 						playcount = 1
 					elif(episode["runtime"] != episode["bookmarkPosition"]):
@@ -213,6 +213,7 @@ def episodes(addon, addonid, pluginhandle, metapath, viewpath, callstackpath, ma
 def myList(viewpath, pluginhandle, metaroot, addon):
 	if os.path.isdir(os.path.join(metaroot, "MyList")):
 		for ffile in os.listdir(os.path.join(metaroot,"MyList")):
+			print ffile
 			try:
 				listTitle(ffile, viewpath, pluginhandle, metaroot, addon)
 			except:
@@ -231,6 +232,7 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot, addon):
 			content = fh.read()
 			fh.close()
 		else:
+			print "not found title: " + str(titleid)
 			content = ""
 
 		data = json.loads(content)
@@ -239,6 +241,11 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot, addon):
 		ctxItems = []
 
 		ctxItems.append((utils.translation(addon, 30112), 'Container.Update(' + viewpath + '?mode=updatetitle&title=' + titleid + '&track=' + str(data["trackId"]) + ')', ))
+
+		if os.path.exists(os.path.join(metaroot, "MyList", titleid)):
+			ctxItems.append((utils.translation(addon, 30115), 'Container.Update(' + viewpath + '?mode=removefrommylist&title=' + titleid + '&track=' + str(data["trackId"]) +')', ))
+		else:
+			ctxItems.append((utils.translation(addon, 30114), 'Container.Update(' + viewpath + '?mode=addtomylist&title=' + titleid + '&track=' + str(data["trackId"]) +')', ))
 
 		li.addContextMenuItems(ctxItems)
 

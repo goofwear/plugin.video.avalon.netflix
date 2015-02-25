@@ -26,6 +26,9 @@
 	<string id="30112">Refresh Title</string>
 	<string id="30113">Refresh My List</string>
 
+	<string id="30114">Add to MyList</string>
+	<string id="30115">Remove from MyList</string>
+
 	<!-- Dialogs start at 30200 -->
 	<string id="30200">Genre cache has expired. Refresh cache now?</string>
 	<string id="30201">Genre Title cache has expired. Refresh cache now?</string>
