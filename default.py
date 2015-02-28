@@ -25,6 +25,7 @@ sys.path.append(os.path.join(xbmc.translatePath('special://home/addons/' + addon
 import avalon_kodi_netflix_interop_auth as auth
 import avalon_kodi_netflix_menus as menus
 import avalon_kodi_utils as utils
+import avalon_kodi_netflix_interop_scrape as scraper
 
 # read addon settings
 username = addon.getSetting('username')
@@ -256,5 +257,6 @@ else:
 		else:
 			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ')')
 
+	scraper.scrapeAPIURL(cookiejar, callstackpath, maxrequestsperminute, metaroot)
 
 	menus.index(addon, addonID, pluginhandle, metaroot, sys.argv[0], callstackpath, maxrequestsperminute, cookiepath);

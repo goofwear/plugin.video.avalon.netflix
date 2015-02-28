@@ -13,6 +13,7 @@ import xbmcplugin
 
 import avalon_kodi_utils as utils
 
+
 def index(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath):
 
 	# create plugin list item (Browse Genres)
@@ -307,6 +308,7 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot, addon):
 
 
 		li.setInfo('video', infoLabels=info)
+
 
 #        - genre : string (Comedy)
 #        - year : integer (2009)
