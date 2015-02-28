@@ -187,106 +187,120 @@ def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, ge
 		fh.close()
 
 def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid, trackid):
-	if(os.path.exists(os.path.join(metapath, "apiurl"))):
-		fh = open(os.path.join(metapath, "apiurl"), 'r')
-		apiurl = fh.read()
+
+	if not os.path.isdir(os.path.join(metapath, "active")):
+		os.mkdir(os.path.join(metapath, "active"))
+
+	if not os.path.exists(os.path.join(metapath, "active", "scrape_title_" + titleid)):
+
+		fh = open(os.path.join(metapath, "active", "scrape_title_" + titleid), 'w')
+		fh.write("currently scraping MyList")
 		fh.close()
 
-
-
-		titleurl = apiurl + "/bob?titleid=" + titleid + "&trackid=" + trackid
-
-		content = utils.makeGetRequest(titleurl, cookies, callstackpath, maxrequestsperminute)
-
-		data = json.loads(content)
-
-		if not os.path.isdir(os.path.join(metapath, "Titles")):
-			os.mkdir(os.path.join(metapath, "Titles"))
-		if not os.path.isdir(os.path.join(metapath, "Titles", titleid)):
-			os.mkdir(os.path.join(metapath, "Titles", titleid))
-
-		fh = open(os.path.join(metapath, "Titles", titleid, "meta.json"), 'w')
-		fh.write(content)
-		fh.close()
-
-		if os.path.exists(os.path.join(metapath, "Titles", titleid, "coverart.jpg")):
-			iconpath = os.path.join(metapath, "Titles", titleid, "coverart.jpg")
-		else:
-			iconpath = ""
-
-		#print os.path.join(metapath, "Titles", titleid, "covertart.jpg")
-
-		thetitle = data["title"]
-		mdplink = data["mdpLink"]
-		trackid = data["trackId"]
-
-		if data["isShow"]:
-
-			seasondataurl = "http://api-global.netflix.com/desktop/odp/episodes?forceEpisodes=true&routing=redirect&video=" + titleid
-			seasondata = utils.makeGetRequest(seasondataurl, cookies, callstackpath, maxrequestsperminute)
-
-			fh = open(os.path.join(metapath, "Titles", titleid, "seasondata.json"),'w')
-			fh.write(seasondata)
+		if(os.path.exists(os.path.join(metapath, "apiurl"))):
+			fh = open(os.path.join(metapath, "apiurl"), 'r')
+			apiurl = fh.read()
 			fh.close()
 
 
 
-			data = json.loads(seasondata)
-			seasoncounter = 0
-			for season in data["episodes"]:
+			titleurl = apiurl + "/bob?titleid=" + titleid + "&trackid=" + trackid
 
-				#http://www.netflix.com/WiMovie/70136119?trkid=50263680&actionMethod=seasonDetails&seasonId=70061401&seasonKind=ELECTRONIC
+			print titleurl
 
+			content = utils.makeGetRequest(titleurl, cookies, callstackpath, maxrequestsperminute)
 
+			data = json.loads(content)
 
-				for episode in season:
-					if not os.path.exists(os.path.join(metapath, "Titles", titleid, "Season " + str(episode["season"]))):
-						os.mkdir(os.path.join(metapath, "Titles", titleid, "Season " + str(episode["season"])))
-					fname = "S" + str(episode["season"]).zfill(2) + "E" + str(episode["episode"]).zfill(2)
-					fh = open(os.path.join(metapath, "Titles", titleid, "Season " + str(episode["season"]), fname + ".json"), 'w')
-					fh.write(json.dumps(episode))
-					fh.close()
+			if not os.path.isdir(os.path.join(metapath, "Titles")):
+				os.mkdir(os.path.join(metapath, "Titles"))
+			if not os.path.isdir(os.path.join(metapath, "Titles", titleid)):
+				os.mkdir(os.path.join(metapath, "Titles", titleid))
 
-					stillswidth = 0
-					stillspath = ""
-					if "stills" in episode:
-						for still in episode["stills"]:
-							width = still["width"]
-							try:
-								if(int(width) > stillswidth):
-									stillswidth = int(width)
-									stillspath = still["url"]
-							except:
-								pass
+			fh = open(os.path.join(metapath, "Titles", titleid, "meta.json"), 'w')
+			fh.write(content)
+			fh.close()
 
-						if stillspath != "":
-							try:
-								stillimage = utils.makeGetRequest(stillspath, cookies, callstackpath, maxrequestsperminute)
-								fh = open(os.path.join(metapath, "Titles", titleid, "Season " + str(episode["season"]), fname + ".jpg"), 'wb')
-								fh.write(stillimage)
-								fh.close()
-							except:
-								pass
+			if os.path.exists(os.path.join(metapath, "Titles", titleid, "coverart.jpg")):
+				iconpath = os.path.join(metapath, "Titles", titleid, "coverart.jpg")
+			else:
+				iconpath = ""
 
-								#http://www.netflix.com/WiMovie/70297439?actionMethod=seasonDetails&seasonId=70296034&seasonKind=ELECTRONIC
-				seasoninfourl = "http://www.netflix.com" + mdplink + "?&actionMethod=seasonDetails&seasonId=" + str(season[0]["seasonId"]) + "&seasonKind=ELECTRONIC"
-				seasoninforesponse = utils.makeGetRequest(seasoninfourl, cookies, callstackpath, maxrequestsperminute)
-				#print seasoninfourl
-				#print seasoninforesponse
-				#print seasoninforesponse
-				seasoninfo = json.loads(seasoninforesponse)
-				#print seasoninfo["html"]
-				seasoninfosynopsismatch = re.compile('<\/h2><p class=\"synopsis\".*?>(.*?)<\/p>', re.DOTALL).findall(seasoninfo["html"])
-				synopsis = ""
-				for syno in seasoninfosynopsismatch:
-					synopsis += syno
+			#print os.path.join(metapath, "Titles", titleid, "covertart.jpg")
 
+			thetitle = data["title"]
+			mdplink = data["mdpLink"]
+			trackid = data["trackId"]
 
-				fh = open(os.path.join(metapath, "Titles", titleid, "Season " + str(season[0]["season"]), "synopsis"), 'w')
-				fh.write(json.dumps(synopsis))
+			if data["isShow"]:
+
+				seasondataurl = "http://api-global.netflix.com/desktop/odp/episodes?forceEpisodes=true&routing=redirect&video=" + titleid
+				seasondata = utils.makeGetRequest(seasondataurl, cookies, callstackpath, maxrequestsperminute)
+
+				fh = open(os.path.join(metapath, "Titles", titleid, "seasondata.json"),'w')
+				fh.write(seasondata)
 				fh.close()
 
-		xbmc.executebuiltin('Notification("Netflix", "' + thetitle.encode('utf-8') + ' has been updated", 5000, ' + iconpath + ')')
+
+
+				data = json.loads(seasondata)
+				seasoncounter = 0
+				for season in data["episodes"]:
+
+					#http://www.netflix.com/WiMovie/70136119?trkid=50263680&actionMethod=seasonDetails&seasonId=70061401&seasonKind=ELECTRONIC
+
+
+
+					for episode in season:
+						if not os.path.exists(os.path.join(metapath, "Titles", titleid, "Season " + str(episode["season"]))):
+							os.mkdir(os.path.join(metapath, "Titles", titleid, "Season " + str(episode["season"])))
+						fname = "S" + str(episode["season"]).zfill(2) + "E" + str(episode["episode"]).zfill(2)
+						fh = open(os.path.join(metapath, "Titles", titleid, "Season " + str(episode["season"]), fname + ".json"), 'w')
+						fh.write(json.dumps(episode))
+						fh.close()
+
+						stillswidth = 0
+						stillspath = ""
+						if "stills" in episode:
+							for still in episode["stills"]:
+								width = still["width"]
+								try:
+									if(int(width) > stillswidth):
+										stillswidth = int(width)
+										stillspath = still["url"]
+								except:
+									pass
+
+							if stillspath != "":
+								try:
+									stillimage = utils.makeGetRequest(stillspath, cookies, callstackpath, maxrequestsperminute)
+									fh = open(os.path.join(metapath, "Titles", titleid, "Season " + str(episode["season"]), fname + ".jpg"), 'wb')
+									fh.write(stillimage)
+									fh.close()
+								except:
+									pass
+
+									#http://www.netflix.com/WiMovie/70297439?actionMethod=seasonDetails&seasonId=70296034&seasonKind=ELECTRONIC
+					seasoninfourl = "http://www.netflix.com" + mdplink + "?&actionMethod=seasonDetails&seasonId=" + str(season[0]["seasonId"]) + "&seasonKind=ELECTRONIC"
+					seasoninforesponse = utils.makeGetRequest(seasoninfourl, cookies, callstackpath, maxrequestsperminute)
+					#print seasoninfourl
+					#print seasoninforesponse
+					#print seasoninforesponse
+					seasoninfo = json.loads(seasoninforesponse)
+					#print seasoninfo["html"]
+					seasoninfosynopsismatch = re.compile('<\/h2><p class=\"synopsis\".*?>(.*?)<\/p>', re.DOTALL).findall(seasoninfo["html"])
+					synopsis = ""
+					for syno in seasoninfosynopsismatch:
+						synopsis += syno
+
+
+					fh = open(os.path.join(metapath, "Titles", titleid, "Season " + str(season[0]["season"]), "synopsis"), 'w')
+					fh.write(json.dumps(synopsis))
+					fh.close()
+
+			xbmc.executebuiltin('Notification("Netflix", "' + thetitle.encode('utf-8') + ' has been updated", 5000, ' + iconpath + ')')
+
+		os.remove(os.path.join(metapath, "active", "scrape_title_" + titleid))
 
 def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 
@@ -359,6 +373,9 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 				else:
 					UpdateTitle = True
 
+				if UpdateTitle:
+					scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid, trackid)
+
 		os.remove(os.path.join(metapath, "active", "scrape_mylist"))
 # 1 UserName
 # 2 Password
@@ -372,3 +389,15 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 # 10 TrackID
 #		if UpdateTitle:
 #			xbmc.executebuiltin('xbmc.runscript(special://home/addons/plugin.video.avalon.netflix/UpdateTitle.py, ' + sys.argv[1] + ', ' + sys.argv[2] + ', ' + titleid + ', ' + trackid + ')')
+
+def scrapeAPIURL(cookies, callstackpath, maxrequestsperminute, metapath):
+	response = utils.makeGetRequest("http://www.netflix.com/WiGenre?agid=83", cookies, callstackpath, maxrequestsperminute)
+	#print response
+	apimatch = re.compile('\"BUILD_IDENTIFIER\":\"(.*?)\".*?\"SHAKTI_API_ROOT\":\"(.*?)\"', re.DOTALL).findall(response)
+	apiurl = ""
+	for build, root in apimatch:
+		apiurl = root + "/" + build
+	if apiurl != "":
+		fh = open(os.path.join(metapath, "apiurl"), 'w')
+		fh.write(apiurl)
+		fh.close()
