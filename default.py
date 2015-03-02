@@ -189,7 +189,13 @@ elif mode == 'removefrommylist':
 		password = addon.getSetting("password")
 
 	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/RemoveFromMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid + ', ' + track + ')')
+elif mode=='search':
+	keyboard = xbmc.Keyboard('', utils.translation(addon, 30203))
+	keyboard.doModal()
+	if keyboard.isConfirmed() and keyboard.getText():
+		search_string = keyboard.getText()
 
+		menus.search(addon, addonID, pluginhandle, sys.argv[0], callstackpath, maxrequestsperminute, cookiejar, search_string, metaroot)
 else:
 
 	# clear any active states

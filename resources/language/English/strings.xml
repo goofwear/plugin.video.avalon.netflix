@@ -34,4 +34,5 @@
 	<string id="30201">Genre Title cache has expired. Refresh cache now?</string>
 	<string id="30202">MyList data has expired. Refresh MyList now?</string>
 	<string id="30203">Enter a Search Query</string>
+	<string id="30204">No results found</string>
 </strings>

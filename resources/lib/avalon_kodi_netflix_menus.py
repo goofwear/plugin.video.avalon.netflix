@@ -37,8 +37,32 @@ def index(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxre
 	url = sys.argv[0] + '?mode=mylist'
 	xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 
+	li = xbmcgui.ListItem(utils.translation(addon, 30103))
+	url = sys.argv[0] + '?mode=search'
+	xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
+
 	#end of directory listing
 	xbmcplugin.endOfDirectory(pluginhandle)
+
+def search(addon, addonID, pluginhandle, viewpath, callstackpath, maxrequestsperminute, cookies, search_string, metaroot):
+	search_query = search_string.replace(' ', '+')
+
+	response = utils.makeGetRequest('http://www.netflix.com/search/' + search_query, cookies, callstackpath, maxrequestsperminute)
+
+	expr = "<div class=\"lockup\" data-titleid=\"(.*?)\" data-trackid=\"(.*?)\">"
+
+	matches = re.compile(expr, re.DOTALL).findall(response)
+
+	itemcount = 0
+	for title, track in matches:
+		listTitle(title, viewpath, pluginhandle, metaroot, addon)
+		itemcount += 1
+
+	if itemcount >= 1:
+		xbmcplugin.endOfDirectory(pluginhandle)
+	else:
+		dialog = xbmcgui.Dialog()
+		ok = dialog.ok('Netflix', utils.translation(addon, 30204))
 
 
 def genres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath):

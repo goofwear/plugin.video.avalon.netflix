@@ -1,3 +1,6 @@
+v 0.3.9
+  + Re-introduce online search
+
 v 0.3.8
   + Scrape MyList now automatically downloads missing titles
   + (Stability Improvement) - Get API URL during init
