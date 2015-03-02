@@ -34,11 +34,7 @@ def scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath, cacheag
 
 			url = url + "WiGenre?agid=" + genreid
 
-			#if genres != "":
-			#	genres += ","
-			#genres += "'{0}':'{1}'".format(genrename, genreid)
 			data[utils.cleanstring(genrename)] = genreid
-			#print genrename
 
 
 			UpdateSubGenres = False
@@ -66,7 +62,6 @@ def scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath, cacheag
 def scrapeSubGenre(cookies, callstackpath, maxrequestsperminute, metapath, url):
 
 	response = utils.makeGetRequest(url, cookies, callstackpath, maxrequestsperminute)
-	#print response
 	apimatch = re.compile('\"BUILD_IDENTIFIER\":\"(.*?)\".*?\"SHAKTI_API_ROOT\":\"(.*?)\"', re.DOTALL).findall(response)
 	apiurl = ""
 	for build, root in apimatch:
@@ -121,7 +116,6 @@ def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, ge
 
 		while not content.startswith('{"catalogItems":[]}'):
 			requesturl = apiurl + "/wigenre?genreId=" + genreid + "&full=false&from=" + str(start) + "&to=" + str(start + size)
-			#print requesturl
 			# increment for next call
 			start = start + size + 1
 
@@ -142,8 +136,6 @@ def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, ge
 
 				if not os.path.isdir(os.path.join(metapath, "Titles", titleid)):
 					os.mkdir(os.path.join(metapath, "Titles", titleid))
-
-				#print boxart
 
 				coverart = utils.makeGetRequest(boxart, cookies, callstackpath, maxrequestsperminute)
 
@@ -202,11 +194,7 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 			apiurl = fh.read()
 			fh.close()
 
-
-
 			titleurl = apiurl + "/bob?titleid=" + titleid + "&trackid=" + trackid
-
-			print titleurl
 
 			content = utils.makeGetRequest(titleurl, cookies, callstackpath, maxrequestsperminute)
 
@@ -225,8 +213,6 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 				iconpath = os.path.join(metapath, "Titles", titleid, "coverart.jpg")
 			else:
 				iconpath = ""
-
-			#print os.path.join(metapath, "Titles", titleid, "covertart.jpg")
 
 			thetitle = data["title"]
 			mdplink = data["mdpLink"]
@@ -283,16 +269,13 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 									#http://www.netflix.com/WiMovie/70297439?actionMethod=seasonDetails&seasonId=70296034&seasonKind=ELECTRONIC
 					seasoninfourl = "http://www.netflix.com" + mdplink + "?&actionMethod=seasonDetails&seasonId=" + str(season[0]["seasonId"]) + "&seasonKind=ELECTRONIC"
 					seasoninforesponse = utils.makeGetRequest(seasoninfourl, cookies, callstackpath, maxrequestsperminute)
-					#print seasoninfourl
-					#print seasoninforesponse
-					#print seasoninforesponse
+
 					seasoninfo = json.loads(seasoninforesponse)
-					#print seasoninfo["html"]
+
 					seasoninfosynopsismatch = re.compile('<\/h2><p class=\"synopsis\".*?>(.*?)<\/p>', re.DOTALL).findall(seasoninfo["html"])
 					synopsis = ""
 					for syno in seasoninfosynopsismatch:
 						synopsis += syno
-
 
 					fh = open(os.path.join(metapath, "Titles", titleid, "Season " + str(season[0]["season"]), "synopsis"), 'w')
 					fh.write(json.dumps(synopsis))
@@ -327,18 +310,13 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 		if '<div id="yui-main">' in content:
 			content = content[content.index('<div id="yui-main">'):]
 
-			print 'gotMyListContent'
-
-			#print content
 
 			for ffile in os.listdir(os.path.join(metapath,"MyList")):
 				os.remove(os.path.join(metapath, "MyList", ffile))
 
 			matches = re.compile(expr, re.DOTALL).findall(content)
-			print matches
 			counter = 0
 			for boxart, titleid, trackid in matches:
-				print boxart
 				counter += 1
 				fh = open(os.path.join(metapath, "MyList", titleid), 'w')
 				fh.write(str(counter))
@@ -387,12 +365,11 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 # 8 MetaRoot
 # 9 TitleID
 # 10 TrackID
-#		if UpdateTitle:
-#			xbmc.executebuiltin('xbmc.runscript(special://home/addons/plugin.video.avalon.netflix/UpdateTitle.py, ' + sys.argv[1] + ', ' + sys.argv[2] + ', ' + titleid + ', ' + trackid + ')')
+
 
 def scrapeAPIURL(cookies, callstackpath, maxrequestsperminute, metapath):
 	response = utils.makeGetRequest("http://www.netflix.com/WiGenre?agid=83", cookies, callstackpath, maxrequestsperminute)
-	#print response
+
 	apimatch = re.compile('\"BUILD_IDENTIFIER\":\"(.*?)\".*?\"SHAKTI_API_ROOT\":\"(.*?)\"', re.DOTALL).findall(response)
 	apiurl = ""
 	for build, root in apimatch:

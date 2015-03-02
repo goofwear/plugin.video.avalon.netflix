@@ -88,13 +88,10 @@ def genres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxr
 			url = viewpath + '?mode=listgenretitles&genre=' + genres[title] + "&genrename=" + urllib.quote_plus(title)
 			xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 
-			#print url
 	if itemcount >= 1:
 		xbmcplugin.endOfDirectory(pluginhandle)
 
 def subGenres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath, genreid):
-
-	print "Netflix: Listing SubGenre " + genreid
 
 	content = ""
 	if(os.path.exists(metapath)):
@@ -112,8 +109,6 @@ def subGenres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, m
 
 			url = viewpath + '?mode=listgenretitles&genre=' + genres[title] + "&genrename="
 			xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
-
-	print itemcount
 
 	if itemcount >= 1:
 		xbmcplugin.endOfDirectory(pluginhandle)
@@ -151,7 +146,6 @@ def seasons(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, max
 			syno = ""
 			title = "Season " + str(season[0]["season"])
 			url = viewpath + "?mode=listepisodes&series=" + seriesid + "&season=" + str(season[0]["season"]) + "&seasonid=" + str(season[0]["seasonId"])
-			print os.path.join(metapath, "Season " + str(season[0]["season"]), "synopsis")
 			if os.path.exists(os.path.join(metapath, "Season " + str(season[0]["season"]), "synopsis")):
 				fh = open(os.path.join(metapath, "Season " + str(season[0]["season"]), "synopsis"), 'r')
 				syno = fh.read()
@@ -183,7 +177,6 @@ def seasons(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, max
 
 
 			info = {'plot': syno, 'year': int(year)}
-			#print info
 
 			li.setInfo('video', infoLabels=info)
 
@@ -238,7 +231,6 @@ def episodes(addon, addonid, pluginhandle, metapath, viewpath, callstackpath, ma
 def myList(viewpath, pluginhandle, metaroot, addon):
 	if os.path.isdir(os.path.join(metaroot, "MyList")):
 		for ffile in os.listdir(os.path.join(metaroot,"MyList")):
-			print ffile
 			try:
 				listTitle(ffile, viewpath, pluginhandle, metaroot, addon)
 			except:

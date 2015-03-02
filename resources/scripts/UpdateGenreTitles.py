@@ -16,7 +16,6 @@ import avalon_kodi_netflix_interop_scrape as scraper
 
 class Main:
 	def __init__(self):
-		#print 'started'
 		metapath = xbmc.translatePath('special://profile/addon_data/' + sys.argv[7])
 		iconpath = xbmc.translatePath('special://home/addons/' + sys.argv[7] + '/icon.png')
 		cookiepath = sys.argv[4]
@@ -32,11 +31,9 @@ class Main:
 
 		#def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, genreid):
 		scraper.scrapeGenreTitles(cookies, sys.argv[5], sys.argv[6], sys.argv[8], sys.argv[9], sys.argv[3], sys.argv[10])
-		#scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath):
 
 
 		xbmc.executebuiltin('Notification("Netflix", "Titles Updated", 5000, ' + iconpath + ')')
-		#print 'done'
 
 	def ensureFolders(self):
 		metapath = xbmc.translatePath('special://profile/addon_data/' + sys.argv[7] + '/meta')

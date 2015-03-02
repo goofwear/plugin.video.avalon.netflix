@@ -36,8 +36,7 @@ class Main:
         cookiepath = sys.argv[4]
 
         cookies = cookielib.MozillaCookieJar()
-        #if os.path.exists(cookiepath):
-        #	cookies.load(cookiepath)
+
 
 
         crumbs = cookies
@@ -48,17 +47,8 @@ class Main:
 
 
 
-        # http://www.netflix.com/AddToQueue?movieid=70153372&evDetail=false&qtype=INSTANT&trkid=13462293&authURL=1424536859109.0FX20tcMm3LhJVtqopdwFPLSgjg%3D&evType=EV2&section=WATCHNOW
-        # makeGetRequest(url, cookies, callstackpath, maxcalls):
-        # requestUrl = "http://www.netflix.com/AddToQueue?movieid={0}&evDetail=false&qtype=INSTANT&trkid={1}&authURL={2}&evType=EV2&section=WATCHNOW"
+
         requestUrl = "http://www.netflix.com/QueueDelete?movieid={0}&authURL={2}"
-        #auth.login(addon.getSetting("username"), addon.getSetting("password"), cookiejar, callstackpath, str(maxrequestsperminute))
-        #login(username, password, cookies, callstackpath, maxcalls):
-        #print cookiejar
-        #cookiejar.save(cookiepath)
-        #print auth.auth
-
-
 
         #Get new authURL
         response = utils.makeGetRequest("http://www.netflix.com", cookies, sys.argv[5], sys.argv[6])
@@ -78,18 +68,8 @@ class Main:
         response = utils.makeGetRequest(requestUrl, cookies, sys.argv[5], str(sys.argv[6]))
 
 
-        #self.ensureFolders()
-
-        #def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, genreid):
-
-
-        #def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid, trackid):
         #def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
         scraper.scrapeMyList(cookies, sys.argv[5], sys.argv[6], sys.argv[8])
-        #scraper.scrapeMyList(cookies, sys.argv[5], sys.argv[6], sys.argv[8], sys.argv[9], sys.argv[10])
-        #scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath):
-
-
         xbmc.executebuiltin('Notification("Netflix", "Title Removed From MyList", 5000, ' + iconpath + ')')
 
 

@@ -29,10 +29,8 @@ class Main:
 
 		self.ensureFolders()
 
-		#def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, genreid):
+
 		scraper.scrapeMyList(cookies, sys.argv[5], sys.argv[6], sys.argv[8])
-		#scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath):
-		#xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metapath + ')'
 
 		xbmc.executebuiltin('Notification("Netflix", "MyList has been Updated", 5000, ' + iconpath + ')')
 

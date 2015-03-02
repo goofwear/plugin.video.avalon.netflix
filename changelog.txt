@@ -1,4 +1,14 @@
-v 0.3.9
+v 0.3.10 (wishlist)
+  [ ] = General tidying Before v 0.4
+  [ ] + automatically update season data when listing a season
+  [ ] + run script to update title if it isn't found in the cache
+  [ ] ! FIXED: Moved scripts to top level folder to avoid warnings about running scripts without addon
+  [x] ! FIXED: Remove redundant log entries
+  [ ] + Add initial icon set for non-title list items
+  [ ] + Better commenting in source
+  [ ] + Appropriate debug/log information
+
+v 0.3.9 (2015-03-02)
   + Re-introduce online search
 
 v 0.3.8
@@ -38,7 +48,7 @@ v 0.3.0
 v 0.2.2
   + Overridden context menu to hide some "resume" options in context menus
   + Added Basic Search functionality
-  + Added Basic automation of MyList ipdating
+  + Added Basic automation of MyList updating
   + Worked to hide some error messages related to encoding of title information
 
 v 0.2.1

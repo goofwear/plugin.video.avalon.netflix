@@ -120,9 +120,6 @@ elif mode == 'playepisode':
 	if(xbmc.Player().isPlaying()):
 		xbmc.Player().stop()
 
-	print playerpath + ' /movieid=' + videoid + ' /seriesid=' + seriesid + ' /savepath=' + os.path.join(metaroot, "titles", seriesid) + ' /un=' + username + ' /pw=' + password
-	print addon.getSetting("username")
-
 	subprocess.Popen(playerpath + ' /movieid=' + videoid + ' /seriesid=' + seriesid + ' /savepath=' + os.path.join(metaroot, "titles", seriesid) + ' /un=' + username + ' /pw=' + password, shell=False)
 
 elif mode == 'mylist':
@@ -157,7 +154,6 @@ elif mode == 'updatetitle':
 		password = addon.getSetting("password")
 
 	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid + ', ' + track + ')')
-	#print 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid
 elif mode == 'updatemylist':
 	while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
 		d = xbmcgui.Dialog()

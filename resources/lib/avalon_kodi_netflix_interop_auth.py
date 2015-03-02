@@ -43,19 +43,10 @@ def login(username, password, cookies, callstackpath, maxcalls):
 	# only login if the cookies aren't valid
 	if not checkLogin(cookies, callstackpath, maxcalls):
 		auth = getAuth(cookies, callstackpath, maxcalls)
-		print auth
 		postdata = {'email': username, 'password': password, 'authURL': auth, 'RememberMe': 'on' }
 		data = urllib.urlencode(postdata)
-		#opener = urllib2.build_opener(proxy_support, urllib2.HTTPHandler(debuglevel=1), urllib2.HTTPCookieProcessor(cookiejar))
-		#opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
-		#opener.addheaders = http_headers
-
-		print postdata
-
-		print data
 
 		# make the request, but don't do anything with it, we're only interested in the cookies!!!
-		#response = opener.open("https://signup.netflix.com/login", str('email='+urllib.quote_plus(username) + "&password=" + urllib.quote_plus(password) + "&authURL=" + urllib.quote_plus(getAuth())).encode('utf-8')).read()
 		try:
 			response = utils.makePostRequest("https://www.netflix.com/Login?locale=en-GB", cookies, callstackpath, maxcalls, data)
 		except:

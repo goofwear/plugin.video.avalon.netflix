@@ -16,7 +16,6 @@ import avalon_kodi_netflix_interop_scrape as scraper
 
 class Main:
 	def __init__(self):
-		print 'started'
 		metapath = xbmc.translatePath('special://profile/addon_data/' + sys.argv[7])
 		iconpath = xbmc.translatePath('special://home/addons/' + sys.argv[7] + '/icon.png')
 		cookiepath = sys.argv[4]
