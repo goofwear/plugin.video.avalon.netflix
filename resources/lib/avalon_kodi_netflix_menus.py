@@ -127,8 +127,9 @@ def genreTitles(addon, addonID, pluginhandle, metapath, viewpath, callstackpath,
 	itemcount = 0
 	if content != "":
 		titles = json.loads(content)
+
 		for title in titles:
-			listTitle(title["titleId"], viewpath, pluginhandle, metaroot, addon, callstackpath, maxrequestsperminute, cookiepath)
+			listTitle(title["titleId"], viewpath, pluginhandle, metaroot, addon, callstackpath, maxrequestsperminute, cookiepath, title["trackid"])
 			itemcount += 1
 
 	if itemcount >= 1:
@@ -242,8 +243,10 @@ def myList(viewpath, pluginhandle, metaroot, addon, callstackpath, maxrequests, 
 
 		xbmcplugin.endOfDirectory(pluginhandle)
 
-def listTitle(titleid, viewpath, pluginhandle, metaroot, addon, callstackpath, maxreq, cookiepath):
+def listTitle(titleid, viewpath, pluginhandle, metaroot, addon, callstackpath, maxreq, cookiepath, trackid):
 	metapath = os.path.join(metaroot, "Titles", titleid)
+	UpdateTitle = False
+	addonID = addon.getAddonInfo('id')
 	if os.path.exists(metapath):
 		datafile = os.path.join(metapath, "meta.json")
 		thumbfile = os.path.join(metapath, "coverart.jpg")
@@ -253,15 +256,17 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot, addon, callstackpath, m
 			content = fh.read()
 			fh.close()
 		else:
-			print "Netflix: Title not found - " + str(titleid)
+			print "Netflix: Title metadata not found - " + str(titleid)
 			content = ""
+			UpdateTitle = True
+
 
 		data = json.loads(content)
 
 		li = xbmcgui.ListItem(data["title"], iconImage = thumbfile, thumbnailImage = thumbfile)
 		ctxItems = []
 
-		addonID = addon.getAddonInfo('id')
+
 		ctxItems.append((utils.translation(addon, 30112), 'xbmc.runscript(special://home/addons/' + str(addonID) + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxreq) + ', ' + addonID + ', ' + metaroot + ', ' + titleid + ', ' + str(data["trackId"]) + ')', ))
 		#ctxItems.append((utils.translation(addon, 30112), 'Container.Update(' + viewpath + '?mode=updatetitle&title=' + titleid + '&track=' + str(data["trackId"]) + ')', ))
 
@@ -320,6 +325,9 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot, addon, callstackpath, m
 					li.setProperty('TotalTime', '100')
 					li.setProperty('ResumeTime', '50')
 
+			else:
+				UpdateTitle = True
+
 			info = {'plot': data['synopsis'], 'year': int(data["year"]), 'mpaa': data["maturityLabel"], "cast": cast, "genre": genres, "playcount": playcount}
 
 		else:
@@ -371,3 +379,10 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot, addon, callstackpath, m
 #        - dateadded : string (Y-m-d h:m:s = 2009-04-05 23:16:04)
 
 		xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=isfolder)
+
+	else:
+		print "Netflix: Title not found - " + str(titleid)
+		UpdateTitle = True
+
+	if UpdateTitle:
+		xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + str(addonID) + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxreq) + ', ' + addonID + ', ' + metaroot + ', ' + titleid + ', ' + str(trackid) + ')')
