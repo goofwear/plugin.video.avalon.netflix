@@ -1,12 +1,14 @@
-v 0.3.91 (wishlist)
-  = General tidying Before v 0.4
-  [?] ! FIXED: Moved scripts to top level folder to avoid warnings about running scripts without addon - is this possible?
-  [x] ! FIXED: Remove redundant log entries
-  [x] + Better commenting in source (ongoing)
-  [ ] + Appropriate debug/log information
-  [x] ! FIXED: Refactor script execution to prevent failed directory listing
+v 0.3.92 Wishlist
+  [ ] Automatically run script for missing titles
+  [ ] Automatically update series data when accessing a series
+  [x] Improvements to request handling (general stability improvements)
 
-v 0.3.9 (2015-03-02)
+v 0.3.91 (2015-03-10)
+  = General tidying Before v 0.4
+  FIXED: Remove redundant log entries
+  FIXED: Refactor script execution to prevent failed directory listing
+
+v 0.3.9 (2015-03-02) - final sprint for v 0.3
   + Re-introduce online search
 
 v 0.3.8

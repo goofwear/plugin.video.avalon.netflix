@@ -166,22 +166,27 @@ def _doGetRequest(url, cookies, callstackpath, lines):
 		fh.write('\n'.join('\n'.join(lines).split()))
 		#fh.writelines(lines)
 		fh.close()
+
+		# make the request and return the response!!!
+		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
+		opener.addheaders = [("Accept-Language", "en-US,en;q=0.5"),  ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"), ("Connection", "keep-alive")]
+		return opener.open(url).read()
+
 	except:
 		time.sleep(1)
 		_doGetRequest(url, cookies, callstackpath, lines)
 
-	# make the request and return the response!!!
-	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
-	opener.addheaders = [("Accept-Language", "en-US,en;q=0.5"),  ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"), ("Connection", "keep-alive")]
-	return opener.open(url).read()
-
-
 def _doPostRequest(url, cookies, callstackpath, lines, data):
-	lines += (str(time.time()),)
-	fh = open(callstackpath, 'w')
-	fh.write('\n'.join('\n'.join(lines).split()))
-	fh.close()
+	try:
+		lines += (str(time.time()),)
+		fh = open(callstackpath, 'w')
+		fh.write('\n'.join('\n'.join(lines).split()))
+		fh.close()
 
-	# make the request and return the response!!!
-	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
-	return opener.open(url, data).read()
+		# make the request and return the response!!!
+		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
+		return opener.open(url, data).read()
+
+	except:
+		time.sleep(1)
+		_doPostRequest(url, cookies, callstackpath, lines, data)
