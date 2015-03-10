@@ -9,9 +9,11 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-
+import cookielib
 
 import avalon_kodi_utils as utils
+import avalon_kodi_netflix_interop_scrape as scraper
+import avalon_kodi_netflix_interop_auth as auth
 
 
 def index(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath):
@@ -138,6 +140,15 @@ def genreTitles(addon, addonID, pluginhandle, metapath, viewpath, callstackpath,
 def seasons(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath, seriesid, metaroot):
 	#metapath = os.path.join(metapath, "titles", seriesid, "seasondata.json")
 
+
+	cookies = cookielib.MozillaCookieJar()
+	if os.path.exists(cookiepath):
+		cookies.load(cookiepath)
+
+	auth.login(addon.getSetting("username"), addon.getSetting("password"), cookies, callstackpath, maxrequestsperminute)
+
+	scraper.scrapeSeasonData(cookies, callstackpath, maxrequestsperminute, metaroot, seriesid)
+
 	if os.path.exists(os.path.join(metapath, "seasondata.json")):
 		xbmcplugin.setContent(pluginhandle, 'seasons')
 
@@ -188,6 +199,7 @@ def seasons(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, max
 			xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 
 		xbmcplugin.endOfDirectory(pluginhandle)
+
 
 def episodes(addon, addonid, pluginhandle, metapath, viewpath, callstackpath, maxreq, cookiepath, seriesid, seasonid, metaroot):
 	if os.path.exists(os.path.join(metapath, "seasondata.json")):

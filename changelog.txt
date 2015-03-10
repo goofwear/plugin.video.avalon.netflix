@@ -1,7 +1,6 @@
 v 0.3.92 Wishlist
   [x] Automatically run script for missing titles
   [ ] Automatically update series data when accessing a series
-  [ ] Download missing Thumbnails
   [x] Improvements to request handling (general stability improvements)
 
 v 0.3.91 (2015-03-10)
