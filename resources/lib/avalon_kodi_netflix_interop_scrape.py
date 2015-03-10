@@ -31,8 +31,8 @@ def scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath, cacheag
 		genres = ""
 		data = collections.OrderedDict()
 		for url, genreid, genrename in matches:
-
-			url = url + "WiGenre?agid=" + genreid
+			print "Netflix: DEBUG: " + url
+			url = "http://www.netflix.com/WiGenre?agid=" + genreid
 
 			data[utils.cleanstring(genrename)] = genreid
 
@@ -58,6 +58,7 @@ def scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath, cacheag
 			fh.close()
 
 		os.remove(os.path.join(metapath, "active", "scrape_genres"))
+
 
 def scrapeSubGenre(cookies, callstackpath, maxrequestsperminute, metapath, url):
 
@@ -96,11 +97,12 @@ def scrapeSubGenre(cookies, callstackpath, maxrequestsperminute, metapath, url):
 
 
 def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, genreid, cacheage, genrename):
+
 	if(os.path.exists(os.path.join(metapath, "apiurl"))):
 		fh = open(os.path.join(metapath, "apiurl"), 'r')
 		apiurl = fh.read()
 		fh.close()
-
+		print "Netflix: Scraping titles for " + genrename
 		content = ""
 
 		start = 0
@@ -281,6 +283,7 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 					fh.write(json.dumps(synopsis))
 					fh.close()
 
+			print "Netflix: " + thetitle.encode('utf-8') + " has been updated"
 			xbmc.executebuiltin('Notification("Netflix", "' + thetitle.encode('utf-8') + ' has been updated", 5000, ' + iconpath + ')')
 
 		os.remove(os.path.join(metapath, "active", "scrape_title_" + titleid))
@@ -355,6 +358,7 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 					scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid, trackid)
 
 		os.remove(os.path.join(metapath, "active", "scrape_mylist"))
+		#xbmc.executebuiltin('Notification("Netflix", "MyList has been Updated", 5000, ' + iconpath + ')')
 # 1 UserName
 # 2 Password
 # 3 CacheAge

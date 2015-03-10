@@ -1,12 +1,10 @@
-v 0.3.10 (wishlist)
-  [ ] = General tidying Before v 0.4
-  [ ] + automatically update season data when listing a season
-  [ ] + run script to update title if it isn't found in the cache
-  [ ] ! FIXED: Moved scripts to top level folder to avoid warnings about running scripts without addon
+v 0.3.91 (wishlist)
+  = General tidying Before v 0.4
+  [?] ! FIXED: Moved scripts to top level folder to avoid warnings about running scripts without addon - is this possible?
   [x] ! FIXED: Remove redundant log entries
-  [ ] + Add initial icon set for non-title list items
-  [ ] + Better commenting in source
+  [x] + Better commenting in source (ongoing)
   [ ] + Appropriate debug/log information
+  [x] ! FIXED: Refactor script execution to prevent failed directory listing
 
 v 0.3.9 (2015-03-02)
   + Re-introduce online search

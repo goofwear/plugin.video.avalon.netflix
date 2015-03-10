@@ -3,6 +3,7 @@ import time
 import urllib2
 import xbmc
 import xbmcvfs
+import time
 
 def translation(addon, id):
 	return addon.getLocalizedString(id).encode('utf-8')
@@ -23,7 +24,7 @@ def fileIsOlderThan(filepath, maxage):
 
 	oneday = 24 * 60 * 60
 
-	if((now - age) > (maxage)):
+	if((now - maxage) > (age)):
 		return True
 	else:
 		return False
@@ -50,11 +51,6 @@ def cleanstring(inputstring):
 	q = y.encode('ascii')
 	q.decode('ascii')
 	s = q.decode('unicode_escape')
-
-
-
-
-
 
 	return s
 
@@ -86,7 +82,7 @@ def makeGetRequest(url, cookies, callstackpath, maxcalls):
 			if len(lines) <= int(maxcalls):
 				doit=True
 			else:
-				print 'too many requests in stack (' + str(len(lines)) + ')'
+				print 'Netflix: Too many requests in stack (' + str(len(lines)) + ')'
 				doit=False
 
 
@@ -105,9 +101,14 @@ def makeGetRequest(url, cookies, callstackpath, maxcalls):
 			fh = open(callstack, 'w')
 			fh.write('\n'.join('\n'.join(lines).split()))
 			fh.close()
+
+
+
 		except Exception, Argumnent:
 			print "Netflix: FileLock encountered - trying again"
 			pass
+
+		time.sleep(1)
 
 	return _doGetRequest(url, cookies, callstackpath, lines)
 
@@ -150,18 +151,24 @@ def makePostRequest(url, cookies, callstackpath, maxcalls, data):
 			print "Netflix: FileLock encountered - retry"
 			doit = false
 
+
+		time.sleep(1)
+
 	return _doPostRequest(url, cookies, callstackpath, lines, data)
 
 
 
 def _doGetRequest(url, cookies, callstackpath, lines):
-	#try:
-	# add a timestamp to the metering file
-	lines += (str(time.time()),)
-	fh = open(callstackpath, 'w')
-	fh.write('\n'.join('\n'.join(lines).split()))
-	#fh.writelines(lines)
-	fh.close()
+	try:
+		# add a timestamp to the metering file
+		lines += (str(time.time()),)
+		fh = open(callstackpath, 'w')
+		fh.write('\n'.join('\n'.join(lines).split()))
+		#fh.writelines(lines)
+		fh.close()
+	except:
+		time.sleep(1)
+		_doGetRequest(url, cookies, callstackpath, lines)
 
 	# make the request and return the response!!!
 	opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))

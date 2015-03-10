@@ -19,9 +19,7 @@ addon = xbmcaddon.Addon()
 addonID = addon.getAddonInfo('id')
 
 # add local lib to sys.path to import local library files
-
 sys.path.append(os.path.join(xbmc.translatePath('special://home/addons/' + addonID), 'resources', 'lib'))
-
 import avalon_kodi_netflix_interop_auth as auth
 import avalon_kodi_netflix_menus as menus
 import avalon_kodi_utils as utils
@@ -35,13 +33,15 @@ password = addon.getSetting('password')
 # determine additional resource paths
 maxrequestsperminute = 50
 
+# set paths for re-use throughout plugin
 metaroot = xbmc.translatePath('special://profile/addon_data/' + addonID + '/meta')
 playerpath = xbmc.translatePath('special://home/addons/' + addonID + '/resources/LaunchPlayer.exe')
-blankvideo = xbmc.translatePath('special://home/addons/' + addonID + '/resources/blank.mp4')
 cookiepath = xbmc.translatePath('special://profile/addon_data/' + addonID + '/cookies')
 callstackpath = xbmc.translatePath('special://profile/addon_data/' + addonID + '/callstack')
 apiurlpath = xbmc.translatePath('special://profile/addon_data/' + addonID + '/apiurl')
 
+if not os.path.exists(metaroot):
+	os.mkdir(metaroot)
 
 # setup the cookies
 cookiejar = cookielib.MozillaCookieJar()
@@ -59,27 +59,24 @@ seasonid = urllib.unquote_plus(params.get('seasonid', ''))
 season = urllib.unquote_plus(params.get('season', ''))
 track = urllib.unquote_plus(params.get('track',''))
 
-# make sure we can login to the Netflix website
-#while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
-#	d = xbmcgui.Dialog()
-#	addon.setSetting("username", d.input(utils.translation(addon, 30004)))
-#	addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
-#	username = addon.getSetting("username")
-#	password = addon.getSetting("password")
-
+# save the cookiejar - we're probably doin it too early here as a login hasn't occured
 cookiejar.save(cookiepath)
 
 
-
+# The real guts start here... which mode are we running?
 if mode == 'listgenres':
-	#def genres(addon, addonID, pluginhandle, metapath, viewpath):
-	menus.genres(addon, addonID, pluginhandle, os.path.join(metaroot, "genres", "genres.json"), sys.argv[0], callstackpath, maxrequestsperminute, cookiepath)
+	# list the genres found in /meta/genres/genres.json
+	# def genres(addon, addonID, pluginhandle, metapath                                       , viewpath   , callstackpath, maxrequestsperminute, cookiepath, metaroot)
+	menus.genres(addon, addonID, pluginhandle, os.path.join(metaroot, "genres", "genres.json"), sys.argv[0], callstackpath, maxrequestsperminute, cookiepath, metaroot)
 elif mode == 'listsubgenres':
-	#def subGenres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath):
+	# list the sub-genres of the genre specified by the genre parameter
+	# def subGenres(addon, addonID, pluginhandle, metapath                                         , viewpath   , callstackpath, maxrequestsperminute, cookiepath, genreid):
 	menus.subGenres(addon, addonID, pluginhandle, os.path.join(metaroot, "genres", genre + ".json"), sys.argv[0], callstackpath, maxrequestsperminute, cookiepath, genre)
 elif mode == 'listgenretitles':
-	#def genreTitles(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath, genreid):
+	# determine the genre's meta data file path
 	genretitlesmetapath = os.path.join(metaroot, "genreTitles", genre + ".json")
+
+	# is the genre file out-of-date or missing?
 	updateGenreTitles = False
 	if os.path.exists(genretitlesmetapath):
 		oneday = 24 * 60 * 60
@@ -88,115 +85,83 @@ elif mode == 'listgenretitles':
 	else:
 		updateGenreTitles = True
 
+	# if the genre file is out-of-date or missing run the update script
 	if updateGenreTitles:
+		# do the settings call for a prompt before updating?
 		if addon.getSetting("promptforcache") == "true":
 			dialog = xbmcgui.Dialog()
 			ret = dialog.yesno('Netflix', utils.translation(addon, 30200))
 			if(ret):
-				# make sure we can login to the Netflix website
-				xbmc.executebuiltin('Container.Update(' + sys.argv[0] + '?mode=updategenretitles&genre=' + genre + '&genrename=' + genrename + ')')
+				# run the script if the user says so...
+				# 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genres[title] + ',' + title + ')'
+				xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genre + ',' + genrename + ')')
 		else:
-			# make sure we can login to the Netflix website
-			xbmc.executebuiltin('Container.Update(' + sys.argv[0] + '?mode=updategenretitles&genre=' + genre + '&genrename=' + genrename + ')')
+			# run the script
+			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genre + ',' + genrename + ')')
 
+	# regardless of inprogress updates list titles for specified genre that we already have data for...
+	# def genreTitles(addon, addonID, pluginhandle, metapath           , viewpath   , callstackpath, maxrequestsperminute, cookiepath, genreid, metaroot):
 	menus.genreTitles(addon, addonID, pluginhandle, genretitlesmetapath, sys.argv[0], callstackpath, maxrequestsperminute, cookiepath, genre, metaroot)
 elif mode == 'listseasons':
+	# determine the mata data folder for the series' title store
 	metapath = os.path.join(metaroot, "Titles", seriesid)
 
-	#def seasons(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath, seriesid, metaroot)
+	# list the seasons for the specified title
+	# def seasons(addon, addonID, pluginhandle, metapath, viewpath   , callstackpath, maxrequestsperminute, cookiepath, seriesid, metaroot)
 	menus.seasons(addon, addonID, pluginhandle, metapath, sys.argv[0], callstackpath, maxrequestsperminute, cookiepath, seriesid, metaroot)
 elif mode == 'listepisodes':
+	# determine the meta data folder for the series' title store
 	metapath = os.path.join(metaroot, "Titles", seriesid)
+
+	# list the episodes for the specified series and season
+	# def episodes(addon, addonid, pluginhandle, metapath, viewpath   , callstackpath, maxreq              , cookiepath, seriesid, seasonid, metaroot)
 	menus.episodes(addon, addonID, pluginhandle, metapath, sys.argv[0], callstackpath, maxrequestsperminute, cookiepath, seriesid, seasonid, metaroot)
 elif mode == 'playvideo':
+	# play the video
+
+	# first of all stop the kodi player if it is currently playing
 	if(xbmc.Player().isPlaying()):
 		xbmc.Player().stop()
-#	xbmc.Player().play(blankvideo)
+
 	try:
 		subprocess.Popen(playerpath + ' /movieid=' + videoid, shell=False)
 	except:
 		pass
+
+
 elif mode == 'playepisode':
+	# play the episode
+
+	# first of all stop the kodi player if it is currently playing
 	if(xbmc.Player().isPlaying()):
 		xbmc.Player().stop()
-
-	subprocess.Popen(playerpath + ' /movieid=' + videoid + ' /seriesid=' + seriesid + ' /savepath=' + os.path.join(metaroot, "titles", seriesid) + ' /un=' + username + ' /pw=' + password, shell=False)
+	try:
+		subprocess.Popen(playerpath + ' /movieid=' + videoid + ' /seriesid=' + seriesid + ' /savepath=' + os.path.join(metaroot, "titles", seriesid) + ' /un=' + username + ' /pw=' + password, shell=False)
+	except:
+		pass
 
 elif mode == 'mylist':
-	#myList(viewpath, pluginhandle, metaroot, addon):
-	menus.myList(sys.argv[0], pluginhandle, metaroot, addon)
-
-elif mode == 'updategenres':
-	# make sure we can login to the Netflix website
-	while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
-		d = xbmcgui.Dialog()
-		addon.setSetting("username", d.input(utils.translation(addon, 30004)))
-		addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
-		username = addon.getSetting("username")
-		password = addon.getSetting("password")
-	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ')')
-elif mode == 'updategenretitles':
-	# make sure we can login to the Netflix website
-	while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
-		d = xbmcgui.Dialog()
-		addon.setSetting("username", d.input(utils.translation(addon, 30004)))
-		addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
-		username = addon.getSetting("username")
-		password = addon.getSetting("password")
-	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genre + ',' + genrename + ')')
-elif mode == 'updatetitle':
-
-	while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
-		d = xbmcgui.Dialog()
-		addon.setSetting("username", d.input(utils.translation(addon, 30004)))
-		addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
-		username = addon.getSetting("username")
-		password = addon.getSetting("password")
-
-	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid + ', ' + track + ')')
-elif mode == 'updatemylist':
-	while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
-		d = xbmcgui.Dialog()
-		addon.setSetting("username", d.input(utils.translation(addon, 30004)))
-		addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
-		username = addon.getSetting("username")
-		password = addon.getSetting("password")
-	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ')')
-
-elif mode == 'addtomylist':
-
-	while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
-		d = xbmcgui.Dialog()
-		addon.setSetting("username", d.input(utils.translation(addon, 30004)))
-		addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
-		username = addon.getSetting("username")
-		password = addon.getSetting("password")
-
-	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/AddToMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid + ', ' + track + ')')
+	# list MyList titles
+	# def myList(viewpath   , pluginhandle, metaroot, addon)
+	menus.myList(sys.argv[0], pluginhandle, metaroot, addon, callstackpath, maxrequestsperminute, cookiepath)
 
 
-elif mode == 'removefrommylist':
-
-	while not auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute):
-		d = xbmcgui.Dialog()
-		addon.setSetting("username", d.input(utils.translation(addon, 30004)))
-		addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
-		username = addon.getSetting("username")
-		password = addon.getSetting("password")
-
-	xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/RemoveFromMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ', ' + videoid + ', ' + track + ')')
 elif mode=='search':
+	# create a keyboard dialog and take a search string
 	keyboard = xbmc.Keyboard('', utils.translation(addon, 30203))
 	keyboard.doModal()
+
+	# if something is entered and submitted, get the text and pass it to the search menu
 	if keyboard.isConfirmed() and keyboard.getText():
 		search_string = keyboard.getText()
 
-		menus.search(addon, addonID, pluginhandle, sys.argv[0], callstackpath, maxrequestsperminute, cookiejar, search_string, metaroot)
+		menus.search(addon, addonID, pluginhandle, sys.argv[0], callstackpath, maxrequestsperminute, cookiejar, search_string, metaroot, cookiepath)
 else:
 
 	# clear any active states
-	if os.path.exists(os.path.join(metaroot, "active", "scrape_mylist")):
-		os.remove(os.path.join(metaroot, "active", "scrape_mylist"))
+	if os.path.exists(os.path.join(metaroot, "active")):
+		for ffile in os.listdir(os.path.join(metaroot, "active")):
+			os.remove(os.path.join(metaroot, "active", ffile))
 
 
 	# check that the basic meta cache has been saved and has not expired
@@ -211,21 +176,28 @@ else:
 	if os.path.exists(os.path.join(metaroot, "active", "scrape_genres")):
 		UpdateGenres = False
 
+	# check if MyList needs to be updated
 	UpdateMyList = False
 	if os.path.isdir(os.path.join(metaroot, "MyList")):
 
 		oneday = 24 * 60 * 60
 		for ffile in os.listdir(os.path.join(metaroot, "MyList")):
 			if utils.fileIsOlderThan(os.path.join(metaroot, "MyList", ffile), (oneday * int(addon.getSetting("mylistage")))):
-
 				UpdateMyList = True
-	else:
 
+		if UpdateMyList:
+			print "Netflix: MyList is out-of-date"
+		else:
+			print "Netflix: MyList is up-to-date"
+	else:
+		print "Netflix: MyList data is not available"
 		UpdateMyList = True
 
+	# don't re-cache if already in progress - this will cause weird bounce on the available titles
 	if os.path.exists(os.path.join(metaroot, "active", "scrape_mylist")):
 		UpdateMyList = False
 
+	# update genres
 	if UpdateGenres:
 
 		if addon.getSetting("promptforcache") == "true":
@@ -239,10 +211,11 @@ else:
 					addon.setSetting("password", d.input(utils.translation(addon, 30005), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT))
 					username = addon.getSetting("username")
 					password = addon.getSetting("password")
-				xbmc.executebuiltin('Container.Update(' + sys.argv[0] + '?mode=updategenres)')
+				xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ')')
 		else:
-			xbmc.executebuiltin('Container.Update(' + sys.argv[0] + '?mode=updategenres)')
+			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ')')
 
+	# update MyList
 	if UpdateMyList:
 		if addon.getSetting("promptformylist") == "true":
 			dialog = xbmcgui.Dialog()
@@ -259,6 +232,9 @@ else:
 		else:
 			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ')')
 
+	# make sure the API url is upto date
 	scraper.scrapeAPIURL(cookiejar, callstackpath, maxrequestsperminute, metaroot)
 
-	menus.index(addon, addonID, pluginhandle, metaroot, sys.argv[0], callstackpath, maxrequestsperminute, cookiepath);
+	# display the main index
+	# def index(addon, addonID, pluginhandle, metapath, viewpath   , callstackpath, maxrequestsperminute, cookiepath)
+	menus.index(addon, addonID, pluginhandle, metaroot, sys.argv[0], callstackpath, maxrequestsperminute, cookiepath)

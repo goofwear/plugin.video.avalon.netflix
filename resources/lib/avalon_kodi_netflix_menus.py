@@ -21,8 +21,8 @@ def index(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxre
 	ctxitms = []
 
 	#xbmc.executebuiltin('Container.Update(' + sys.argv[0] + '?mode=updategenretitles&genre=' + genre + '&genrename=' + genrename + ')')
-	ctxitms.append((utils.translation(addon, 30110), 'Container.Update(' + viewpath + '?mode=updategenres)', ))
-	#ctxitms.append((utils.translation(addon, 30111), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metapath + ')'))
+	#ctxitms.append((utils.translation(addon, 30110), 'Container.Update(' + viewpath + '?mode=updategenres)', ))
+	ctxitms.append((utils.translation(addon, 30110), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenres.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metapath + ')'))
 
 	li.addContextMenuItems(ctxitms)
 	url = sys.argv[0] + '?mode=listgenres'
@@ -30,8 +30,8 @@ def index(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxre
 
 	li = xbmcgui.ListItem(utils.translation(addon,30102))
 	ctxitms = []
-	#ctxitms.append((utils.translation(addon, 30113), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metapath + ')'))
-	ctxitms.append((utils.translation(addon, 30113), 'Container.Update(' + viewpath + '?mode=updatemylist)', ))
+
+	ctxitms.append((utils.translation(addon, 30113), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metapath + ')', ))
 
 	li.addContextMenuItems(ctxitms)
 	url = sys.argv[0] + '?mode=mylist'
@@ -44,7 +44,7 @@ def index(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxre
 	#end of directory listing
 	xbmcplugin.endOfDirectory(pluginhandle)
 
-def search(addon, addonID, pluginhandle, viewpath, callstackpath, maxrequestsperminute, cookies, search_string, metaroot):
+def search(addon, addonID, pluginhandle, viewpath, callstackpath, maxrequestsperminute, cookies, search_string, metaroot, cookiepath):
 	search_query = search_string.replace(' ', '+')
 
 	response = utils.makeGetRequest('http://www.netflix.com/search/' + search_query, cookies, callstackpath, maxrequestsperminute)
@@ -55,7 +55,7 @@ def search(addon, addonID, pluginhandle, viewpath, callstackpath, maxrequestsper
 
 	itemcount = 0
 	for title, track in matches:
-		listTitle(title, viewpath, pluginhandle, metaroot, addon)
+		listTitle(title, viewpath, pluginhandle, metaroot, addon, callstackpath, maxrequestsperminute, cookiepath)
 		itemcount += 1
 
 	if itemcount >= 1:
@@ -65,7 +65,7 @@ def search(addon, addonID, pluginhandle, viewpath, callstackpath, maxrequestsper
 		ok = dialog.ok('Netflix', utils.translation(addon, 30204))
 
 
-def genres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath):
+def genres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath, metaroot):
 
 	content = ""
 
@@ -83,7 +83,11 @@ def genres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxr
 			li = xbmcgui.ListItem(title)
 			ctxitms = []
 			ctxitms.append((utils.translation(addon, 30101), 'Container.Update(' + viewpath + '?mode=listsubgenres&genre=' + genres[title] + ')', ))
-			ctxitms.append((utils.translation(addon, 30111), 'Container.Update(' + viewpath + '?mode=updategenretitles&genre=' + genres[title] + '&genrename=' + title + ')', ))
+			#ctxitms.append((utils.translation(addon, 30111), 'Container.Update(' + viewpath + '?mode=updategenretitles&genre=' + genres[title] + '&genrename=' + title + ')', ))
+
+
+
+			ctxitms.append((utils.translation(addon,30111), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genres[title] + ',' + title + ')', ))
 			li.addContextMenuItems(ctxitms)
 			url = viewpath + '?mode=listgenretitles&genre=' + genres[title] + "&genrename=" + urllib.quote_plus(title)
 			xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
@@ -124,7 +128,7 @@ def genreTitles(addon, addonID, pluginhandle, metapath, viewpath, callstackpath,
 	if content != "":
 		titles = json.loads(content)
 		for title in titles:
-			listTitle(title["titleId"], viewpath, pluginhandle, metaroot, addon)
+			listTitle(title["titleId"], viewpath, pluginhandle, metaroot, addon, callstackpath, maxrequestsperminute, cookiepath)
 			itemcount += 1
 
 	if itemcount >= 1:
@@ -228,17 +232,17 @@ def episodes(addon, addonid, pluginhandle, metapath, viewpath, callstackpath, ma
 
 		xbmcplugin.endOfDirectory(pluginhandle)
 
-def myList(viewpath, pluginhandle, metaroot, addon):
+def myList(viewpath, pluginhandle, metaroot, addon, callstackpath, maxrequests, cookiepath):
 	if os.path.isdir(os.path.join(metaroot, "MyList")):
 		for ffile in os.listdir(os.path.join(metaroot,"MyList")):
-			try:
-				listTitle(ffile, viewpath, pluginhandle, metaroot, addon)
-			except:
-				pass
+			#try:
+			listTitle(ffile, viewpath, pluginhandle, metaroot, addon, callstackpath, maxrequests, cookiepath)
+			#except:
+			#	pass
 
 		xbmcplugin.endOfDirectory(pluginhandle)
 
-def listTitle(titleid, viewpath, pluginhandle, metaroot, addon):
+def listTitle(titleid, viewpath, pluginhandle, metaroot, addon, callstackpath, maxreq, cookiepath):
 	metapath = os.path.join(metaroot, "Titles", titleid)
 	if os.path.exists(metapath):
 		datafile = os.path.join(metapath, "meta.json")
@@ -249,7 +253,7 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot, addon):
 			content = fh.read()
 			fh.close()
 		else:
-			print "not found title: " + str(titleid)
+			print "Netflix: Title not found - " + str(titleid)
 			content = ""
 
 		data = json.loads(content)
@@ -257,12 +261,16 @@ def listTitle(titleid, viewpath, pluginhandle, metaroot, addon):
 		li = xbmcgui.ListItem(data["title"], iconImage = thumbfile, thumbnailImage = thumbfile)
 		ctxItems = []
 
-		ctxItems.append((utils.translation(addon, 30112), 'Container.Update(' + viewpath + '?mode=updatetitle&title=' + titleid + '&track=' + str(data["trackId"]) + ')', ))
+		addonID = addon.getAddonInfo('id')
+		ctxItems.append((utils.translation(addon, 30112), 'xbmc.runscript(special://home/addons/' + str(addonID) + '/resources/scripts/UpdateTitle.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxreq) + ', ' + addonID + ', ' + metaroot + ', ' + titleid + ', ' + str(data["trackId"]) + ')', ))
+		#ctxItems.append((utils.translation(addon, 30112), 'Container.Update(' + viewpath + '?mode=updatetitle&title=' + titleid + '&track=' + str(data["trackId"]) + ')', ))
 
 		if os.path.exists(os.path.join(metaroot, "MyList", titleid)):
-			ctxItems.append((utils.translation(addon, 30115), 'Container.Update(' + viewpath + '?mode=removefrommylist&title=' + titleid + '&track=' + str(data["trackId"]) +')', ))
+			ctxItems.append((utils.translation(addon, 30115), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/RemoveFromMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxreq) + ', ' + addonID + ', ' + metaroot + ', ' + titleid + ', ' + str(data["trackId"]) + ')', ))
+			#ctxItems.append((utils.translation(addon, 30115), 'Container.Update(' + viewpath + '?mode=removefrommylist&title=' + titleid + '&track=' + str(data["trackId"]) +')', ))
 		else:
-			ctxItems.append((utils.translation(addon, 30114), 'Container.Update(' + viewpath + '?mode=addtomylist&title=' + titleid + '&track=' + str(data["trackId"]) +')', ))
+			ctxItems.append((utils.translation(addon, 30114), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/AddToMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxreq) + ', ' + addonID + ', ' + metaroot + ', ' + titleid + ', ' + str(data["trackId"]) + ')', ))
+			#ctxItems.append((utils.translation(addon, 30114), 'Container.Update(' + viewpath + '?mode=addtomylist&title=' + titleid + '&track=' + str(data["trackId"]) +')', ))
 
 		li.addContextMenuItems(ctxItems)
 

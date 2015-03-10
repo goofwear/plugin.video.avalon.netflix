@@ -32,7 +32,7 @@ class Main:
 
 		scraper.scrapeMyList(cookies, sys.argv[5], sys.argv[6], sys.argv[8])
 
-		xbmc.executebuiltin('Notification("Netflix", "MyList has been Updated", 5000, ' + iconpath + ')')
+		#xbmc.executebuiltin('Notification("Netflix", "MyList has been Updated", 5000, ' + iconpath + ')')
 
 	def ensureFolders(self):
 		metapath = xbmc.translatePath('special://profile/addon_data/' + sys.argv[7] + '/meta')

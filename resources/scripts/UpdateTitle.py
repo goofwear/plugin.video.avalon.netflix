@@ -46,7 +46,7 @@ class Main:
 		scraper.scrapeTitle(cookies, sys.argv[5], sys.argv[6], sys.argv[8], sys.argv[9], sys.argv[10])
 
 
-		xbmc.executebuiltin('Notification("Netflix", "Title Updated", 5000, ' + iconpath + ')')
+		#xbmc.executebuiltin('Notification("Netflix", "Title Updated", 5000, ' + iconpath + ')')
 
 
 	def ensureFolders(self):
