@@ -244,6 +244,8 @@ def scrapeSeasonData(cookies, callstackpath, maxrequestsperminute, metapath, tit
 			fh.write(json.dumps(synopsis))
 			fh.close()
 
+		print "Netflix: " + thetitle.encode('utf-8') + " season data has been updated"
+
 def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid, trackid):
 
 	if not os.path.isdir(os.path.join(metapath, "active")):
@@ -350,8 +352,8 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 					fh.write(json.dumps(synopsis))
 					fh.close()
 
-			print "Netflix: " + thetitle.encode('utf-8') + " season data has been updated"
-			#xbmc.executebuiltin('Notification("Netflix", "' + thetitle.encode('utf-8') + ' has been updated", 5000, ' + iconpath + ')')
+			print "Netflix: " + thetitle.encode('utf-8') + " has been updated"
+			xbmc.executebuiltin('Notification("Netflix", "' + thetitle.encode('utf-8') + ' has been updated", 5000, ' + iconpath + ')')
 
 		os.remove(os.path.join(metapath, "active", "scrape_title_" + titleid))
 

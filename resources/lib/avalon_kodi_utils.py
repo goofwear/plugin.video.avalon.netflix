@@ -110,7 +110,7 @@ def makeGetRequest(url, cookies, callstackpath, maxcalls):
 
 		time.sleep(1)
 
-	return _doGetRequest(url, cookies, callstackpath, lines)
+	return _doGetRequest(url, cookies, callstackpath, lines, maxcalls)
 
 # Make an HTTP GET request using the provided cookies, checking the callstack, to ensure we don't get throttled
 def makePostRequest(url, cookies, callstackpath, maxcalls, data):
@@ -158,12 +158,14 @@ def makePostRequest(url, cookies, callstackpath, maxcalls, data):
 
 
 
-def _doGetRequest(url, cookies, callstackpath, lines):
+def _doGetRequest(url, cookies, callstackpath, lines, maxcalls):
+	#def makeGetRequest(url, cookies, callstackpath, maxcalls):
 	try:
 		# add a timestamp to the metering file
-		lines += (str(time.time()),)
+		newlines = lines
+		newlines += (str(time.time()),)
 		fh = open(callstackpath, 'w')
-		fh.write('\n'.join('\n'.join(lines).split()))
+		fh.write('\n'.join('\n'.join(newlines).split()))
 		#fh.writelines(lines)
 		fh.close()
 
@@ -174,13 +176,14 @@ def _doGetRequest(url, cookies, callstackpath, lines):
 
 	except:
 		time.sleep(1)
-		_doGetRequest(url, cookies, callstackpath, lines)
+		makeGetRequest(url, cookies, callstackpath, maxcalls)
 
 def _doPostRequest(url, cookies, callstackpath, lines, data):
 	try:
-		lines += (str(time.time()),)
+		newlines = lines
+		newlines += (str(time.time()),)
 		fh = open(callstackpath, 'w')
-		fh.write('\n'.join('\n'.join(lines).split()))
+		fh.write('\n'.join('\n'.join(newlines).split()))
 		fh.close()
 
 		# make the request and return the response!!!

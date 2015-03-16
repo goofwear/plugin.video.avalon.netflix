@@ -249,7 +249,7 @@ def myList(viewpath, pluginhandle, metaroot, addon, callstackpath, maxrequests, 
 	if os.path.isdir(os.path.join(metaroot, "MyList")):
 		for ffile in os.listdir(os.path.join(metaroot,"MyList")):
 			#try:
-			listTitle(ffile, viewpath, pluginhandle, metaroot, addon, callstackpath, maxrequests, cookiepath)
+			listTitle(ffile, viewpath, pluginhandle, metaroot, addon, callstackpath, maxrequests, cookiepath, '')
 			#except:
 			#	pass
 
