@@ -1,7 +1,7 @@
-v 0.3.92 Wishlist
-  [x] Automatically run script for missing titles
-  [ ] Automatically update series data when accessing a series
-  [x] Improvements to request handling (general stability improvements)
+v 0.3.92 (2015-03-16)
+  Automatically run script for missing titles
+  Automatically update series data when accessing a series
+  Improvements to request handling (general stability improvements)
 
 v 0.3.91 (2015-03-10)
   = General tidying Before v 0.4

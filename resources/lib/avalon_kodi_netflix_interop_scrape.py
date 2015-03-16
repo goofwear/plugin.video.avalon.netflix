@@ -244,7 +244,7 @@ def scrapeSeasonData(cookies, callstackpath, maxrequestsperminute, metapath, tit
 			fh.write(json.dumps(synopsis))
 			fh.close()
 
-		print "Netflix: " + thetitle.encode('utf-8') + " season data has been updated"
+		
 
 def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid, trackid):
 
