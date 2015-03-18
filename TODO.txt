@@ -1,0 +1,13 @@
+To Do List for version 1
+
+  [ ] Handle multiple Profiles
+    [ ] Select master profile
+    [ ] Switch profile
+
+  [ ] Cross platform
+
+  [ ] Better remote control handling
+
+  [ ] Options for live read vs. Offline scrape
+
+  [ ] First run initialization
