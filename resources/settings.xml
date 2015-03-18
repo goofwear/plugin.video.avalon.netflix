@@ -2,12 +2,16 @@
 <settings>
 	<category label="30001">
 		<setting id="username" label="30002" type="text" default="" />
-		<setting id="password" label="30003" type="text" default="" option="hidden" />		
+		<setting id="password" label="30003" type="text" default="" option="hidden" />
 	</category>
 	<category label="30010">
-		<setting id="cacheage" label="30011" type="number" default="30" />
-		<setting id="promptforcache" label="30012" type="bool" default="true" />
-		<setting id="mylistage" label="30013" type="number" default="1" />
-		<setting id="promptformylist" label="30014" type="bool" default="false" />
+		<setting id="keepcache" label="30015" type="bool" default="true" />
+		<setting type="lsep" label="30016" enable="eq(-1,True)" />
+		<setting id="maxgenrecacheage" label="30011" type="number" default="30" enable="eq(-2,True)" />
+		<setting id="maxgenretitlecacheage" label="30012" type="number" default="7" enable="eq(-3,True)" />
+		<setting id="maxtitlecacheage" label="30013" type="number" default="30" enable="eq(-4,True)" />
+		<setting id="maxmylistcacheage" label="30014" type="number" default="0" enable="eq(-5,True)" />
+		<setting type="lsep" label="30017" enable="eq(-6,True)" />
+		<setting type="lsep" label="30018" enable="eq(-7,True)" />
 	</category>
 </settings>
