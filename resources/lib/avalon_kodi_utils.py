@@ -56,7 +56,7 @@ def cleanstring(inputstring):
 
 
 # Make an HTTP GET request using the provided cookies, checking the callstack, to ensure we don't get throttled
-def makeGetRequest(url, cookies, callstackpath, maxcalls):
+def makeGetRequest(url, cookies, callstackpath, maxcalls, trycount):
 
 
 	callstack = callstackpath
@@ -110,7 +110,7 @@ def makeGetRequest(url, cookies, callstackpath, maxcalls):
 
 		time.sleep(1)
 
-	return _doGetRequest(url, cookies, callstackpath, lines, maxcalls)
+	return _doGetRequest(url, cookies, callstackpath, lines, maxcalls, trycount)
 
 # Make an HTTP GET request using the provided cookies, checking the callstack, to ensure we don't get throttled
 def makePostRequest(url, cookies, callstackpath, maxcalls, data):
@@ -158,9 +158,10 @@ def makePostRequest(url, cookies, callstackpath, maxcalls, data):
 
 
 
-def _doGetRequest(url, cookies, callstackpath, lines, maxcalls):
-	#def makeGetRequest(url, cookies, callstackpath, maxcalls):
+def _doGetRequest(url, cookies, callstackpath, lines, maxcalls, trycount):
+	#def makeGetRequest(url, cookies, callstackpath, maxcalls, trycount):
 	try:
+
 		# add a timestamp to the metering file
 		newlines = lines
 		newlines += (str(time.time()),)
@@ -172,11 +173,17 @@ def _doGetRequest(url, cookies, callstackpath, lines, maxcalls):
 		# make the request and return the response!!!
 		opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
 		opener.addheaders = [("Accept-Language", "en-US,en;q=0.5"),  ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"), ("Connection", "keep-alive")]
+
 		return opener.open(url).read()
 
 	except:
+		trycount = trycount + 1
 		time.sleep(1)
-		makeGetRequest(url, cookies, callstackpath, maxcalls)
+		if trycount > 10:
+			print "Netflix: Unable to retrieve a request within 10 retry intervals"
+			return ''
+		else:
+			makeGetRequest(url, cookies, callstackpath, maxcalls, trycount)
 
 def _doPostRequest(url, cookies, callstackpath, lines, data):
 	try:

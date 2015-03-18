@@ -23,7 +23,7 @@ def scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath, cacheag
 		fh.write("currently scraping Genres")
 		fh.close()
 
-		response = utils.makeGetRequest('http://www.netflix.com', cookies, callstackpath, maxrequestsperminute)
+		response = utils.makeGetRequest('http://www.netflix.com', cookies, callstackpath, maxrequestsperminute, 0)
 		matches = re.compile("<li><a href=\"(.*?)WiGenre\\?agid=(.*?)\">(.*?)</a></li>", re.DOTALL).findall(response)
 
 		genrefile = os.path.join(metapath, "genres", "genres.json")
@@ -62,7 +62,7 @@ def scrapeGenres(cookies, callstackpath, maxrequestsperminute, metapath, cacheag
 
 def scrapeSubGenre(cookies, callstackpath, maxrequestsperminute, metapath, url):
 
-	response = utils.makeGetRequest(url, cookies, callstackpath, maxrequestsperminute)
+	response = utils.makeGetRequest(url, cookies, callstackpath, maxrequestsperminute, 0)
 	apimatch = re.compile('\"BUILD_IDENTIFIER\":\"(.*?)\".*?\"SHAKTI_API_ROOT\":\"(.*?)\"', re.DOTALL).findall(response)
 	apiurl = ""
 	for build, root in apimatch:
@@ -121,7 +121,7 @@ def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, ge
 			# increment for next call
 			start = start + size + 1
 
-			content = utils.makeGetRequest(requesturl, cookies, callstackpath, maxrequestsperminute)
+			content = utils.makeGetRequest(requesturl, cookies, callstackpath, maxrequestsperminut, 0)
 
 			match = re.compile("{\"boxart\":\"(.*?)\",\"titleId\":(.*?),\"title\":\"(.*?)\",\"playerUrl\":\"(.*?)\",\"trackId\":(.*?)}", re.DOTALL).findall(content)
 
@@ -139,7 +139,7 @@ def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, ge
 				if not os.path.isdir(os.path.join(metapath, "Titles", titleid)):
 					os.mkdir(os.path.join(metapath, "Titles", titleid))
 
-				coverart = utils.makeGetRequest(boxart, cookies, callstackpath, maxrequestsperminute)
+				coverart = utils.makeGetRequest(boxart, cookies, callstackpath, maxrequestsperminut, 0)
 
 				fh = open(os.path.join(metapath, "Titles", titleid, "folder.jpg"), 'wb')
 				fh.write(coverart)
@@ -182,7 +182,7 @@ def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, ge
 
 def scrapeSeasonData(cookies, callstackpath, maxrequestsperminute, metapath, titleid):
 	seasondataurl = "http://api-global.netflix.com/desktop/odp/episodes?forceEpisodes=true&routing=redirect&video=" + titleid
-	seasondata = utils.makeGetRequest(seasondataurl, cookies, callstackpath, maxrequestsperminute)
+	seasondata = utils.makeGetRequest(seasondataurl, cookies, callstackpath, maxrequestsperminut, 0)
 
 	fh = open(os.path.join(metapath, "Titles", titleid, "seasondata.json"),'w')
 	fh.write(seasondata)
@@ -231,7 +231,7 @@ def scrapeSeasonData(cookies, callstackpath, maxrequestsperminute, metapath, tit
 						#http://www.netflix.com/WiMovie/70297439?actionMethod=seasonDetails&seasonId=70296034&seasonKind=ELECTRONIC
 		if not os.path.exists(os.path.join(metapath, "Titles", titleid, "Season " + str(season[0]["season"]), "synopsis")):
 			seasoninfourl = "http://www.netflix.com/WiMovie/" + titleid + "?&actionMethod=seasonDetails&seasonId=" + str(season[0]["seasonId"]) + "&seasonKind=ELECTRONIC"
-			seasoninforesponse = utils.makeGetRequest(seasoninfourl, cookies, callstackpath, maxrequestsperminute)
+			seasoninforesponse = utils.makeGetRequest(seasoninfourl, cookies, callstackpath, maxrequestsperminute, 0)
 
 			seasoninfo = json.loads(seasoninforesponse)
 
@@ -244,7 +244,7 @@ def scrapeSeasonData(cookies, callstackpath, maxrequestsperminute, metapath, tit
 			fh.write(json.dumps(synopsis))
 			fh.close()
 
-		
+
 
 def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid, trackid):
 
@@ -264,7 +264,7 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 
 			titleurl = apiurl + "/bob?titleid=" + titleid + "&trackid=" + trackid
 
-			content = utils.makeGetRequest(titleurl, cookies, callstackpath, maxrequestsperminute)
+			content = utils.makeGetRequest(titleurl, cookies, callstackpath, maxrequestsperminute, 0)
 
 			data = json.loads(content)
 
@@ -289,7 +289,7 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 			if data["isShow"]:
 
 				seasondataurl = "http://api-global.netflix.com/desktop/odp/episodes?forceEpisodes=true&routing=redirect&video=" + titleid
-				seasondata = utils.makeGetRequest(seasondataurl, cookies, callstackpath, maxrequestsperminute)
+				seasondata = utils.makeGetRequest(seasondataurl, cookies, callstackpath, maxrequestsperminut, 0)
 
 				fh = open(os.path.join(metapath, "Titles", titleid, "seasondata.json"),'w')
 				fh.write(seasondata)
@@ -329,7 +329,7 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 
 							if stillspath != "":
 								try:
-									stillimage = utils.makeGetRequest(stillspath, cookies, callstackpath, maxrequestsperminute)
+									stillimage = utils.makeGetRequest(stillspath, cookies, callstackpath, maxrequestsperminute,0)
 									fh = open(os.path.join(metapath, "Titles", titleid, "Season " + str(episode["season"]), fname + ".jpg"), 'wb')
 									fh.write(stillimage)
 									fh.close()
@@ -339,7 +339,7 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 									#http://www.netflix.com/WiMovie/70297439?actionMethod=seasonDetails&seasonId=70296034&seasonKind=ELECTRONIC
 
 					seasoninfourl = "http://www.netflix.com" + mdplink + "?&actionMethod=seasonDetails&seasonId=" + str(season[0]["seasonId"]) + "&seasonKind=ELECTRONIC"
-					seasoninforesponse = utils.makeGetRequest(seasoninfourl, cookies, callstackpath, maxrequestsperminute)
+					seasoninforesponse = utils.makeGetRequest(seasoninfourl, cookies, callstackpath, maxrequestsperminute, 0)
 
 					seasoninfo = json.loads(seasoninforesponse)
 
@@ -372,8 +372,8 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 
 
 
-		#def makeGetRequest(url, cookies, callstackpath, maxcalls):
-		content = utils.makeGetRequest("https://www.netflix.com/MyList", cookies, callstackpath, maxrequestsperminute)
+		#def makeGetRequest(url, cookies, callstackpath, maxcalls, trycount):
+		content = utils.makeGetRequest("https://www.netflix.com/MyList", cookies, callstackpath, maxrequestsperminute, 0)
 		#expr = "<div.*?class=\"agMovie agMovie-lulg\".*?<img.*?src=\"(.*?)\".*?>.*?<a.*?WiPlayer\\?movieid=(.*?)&trkid=(.*?)&";
 		expr = '<div class="agMovie agMovie-lulg">.*?<img.*?src="(.*?)" ><a .*? href=".*?WiPlayer\\?movieid=(.*?)&trkid=(.*?)&'
 		#content = content.decode('utf-8')
@@ -395,7 +395,7 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 				fh.close()
 
 				titlefile = os.path.join(metapath, 'Titles', titleid, 'meta.json')
-				coverart = utils.makeGetRequest(boxart, cookies, callstackpath, maxrequestsperminute)
+				coverart = utils.makeGetRequest(boxart, cookies, callstackpath, maxrequestsperminute, 0)
 				if not os.path.isdir(os.path.join(metapath, "Titles", titleid)):
 					os.mkdir(os.path.join(metapath, "Titles", titleid))
 
@@ -441,7 +441,7 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 
 
 def scrapeAPIURL(cookies, callstackpath, maxrequestsperminute, metapath):
-	response = utils.makeGetRequest("http://www.netflix.com/WiGenre?agid=83", cookies, callstackpath, maxrequestsperminute)
+	response = utils.makeGetRequest("http://www.netflix.com/WiGenre?agid=83", cookies, callstackpath, maxrequestsperminute, 0)
 
 	apimatch = re.compile('\"BUILD_IDENTIFIER\":\"(.*?)\".*?\"SHAKTI_API_ROOT\":\"(.*?)\"', re.DOTALL).findall(response)
 	apiurl = ""

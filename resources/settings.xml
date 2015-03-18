@@ -28,7 +28,6 @@
 		<setting id="forceviews_titles" type="number" label="30029" enable="eq(-6,True)" />
 		<setting id="forceviews_seasons" type="number" label="30030" enable="eq(-7,True)" />
 		<setting id="forceviews_episodes" type="number" label="30031" enable="eq(-8,True)" />
-		<!--<setting type="lsep" label="30023" enable="eq(-9,True)" />
-		<setting type="lsep" label="30032" enable="eq(-10,True)" />-->
+
 	</category>
 </settings>

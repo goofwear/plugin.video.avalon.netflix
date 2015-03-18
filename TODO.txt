@@ -1,13 +1,40 @@
 To Do List for version 1
 
-  [ ] Handle multiple Profiles
+(Each top level = 0.x)
+
+  [ ] Options for live read vs. Offline scrape (v 0.5)
+    [ ] Live Scrape for all sections
+      [x] Genres
+      [ ] Sub-Genres
+      [ ] Genre Titles
+      [ ] Seasons
+      [ ] Episodes
+      [ ] MyList
+      [ ] Search Results
+    [ ] Add retry counter in request functionality
+    [ ] Keep a local cache? (default = yes) == only basic metadata will be available if set to "no"
+    [ ] Genre cache expiry (default = 30 days) == check for new genres
+    [ ] Genre Title cache expiry (default = 7 days) == check for new titles
+    [ ] Title cache expiry (default = 30 days) == check for title updates
+    [ ] MyList cache expiry (default = 1 day) == refresh MyList
+    [ ] Title directory item count (default = 500) == how many items to display on a page?
+    [ ] Force View styles
+      [ ] Genres
+      [ ] Titles
+      [ ] Seasons
+      [ ] Episodes
+      [ ] Search Results
+      [ ] MyList
+
+  [ ] First run initialization (v0.6)
+    [ ] Force configuration Wizard
+    [ ] Option to start a full scrape (only when using offline cache)
+
+
+  [ ] Handle multiple Profiles (v0.7)
     [ ] Select master profile
     [ ] Switch profile
 
-  [ ] Cross platform
+  [ ] Cross platform (v0.8)
 
-  [ ] Better remote control handling
-
-  [ ] Options for live read vs. Offline scrape
-
-  [ ] First run initialization
+  [ ] Better remote control handling (v0.9)
