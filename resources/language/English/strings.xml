@@ -18,6 +18,20 @@
 	<string id="30017">Local cache will be used until the expiry age is reached for each list type</string>
 	<string id="30018">(genres, genre, title, etc).</string>
 
+	<string id="30020">Display</string>
+	<string id="30021">Number of titles to display when browsing genres</string>
+	<string id="30022">Force view for listings</string>
+	<string id="30023">To force a view for a type of listing set the id of the view to use.</string>
+	<string id="30024">Use "0" to not force the view for that listing type.</string>
+	<string id="30025">Index</string>
+	<string id="30026">Genres</string>
+	<string id="30027">MyList</string>
+	<string id="30028">Search Results</string>
+	<string id="30029">Titles</string>
+	<string id="30030">Seasons</string>
+	<string id="30031">Episodes</string>
+	<string id="30032">The settings above may be overridden once the list is loaded</string>
+
 	<!-- Lists start at 30100 -->
 	<string id="30100">Browse Genres</string>
 	<string id="30101">Sub Genres</string>
