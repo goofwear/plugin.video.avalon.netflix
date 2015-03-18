@@ -1,3 +1,4 @@
+import cookielib
 import collections
 import os
 import re
@@ -71,31 +72,93 @@ def genres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxr
 
 	content = ""
 
-	if(os.path.exists(metapath)):
-		fh = open(metapath, 'r')
-		content = fh.read()
-		fh.close()
+	readcache = False
+
+	if addon.getSetting("keepcache") == "true":
+		print "Netflix: Attempting to read genres from cache"
+		readcache = True
+	else:
+		print "Netflix: Local cache is disabled get data online"
+		readcache = False
+
+	if readcache:
+		# is there a local meta cache?
+		if(os.path.exists(metapath)):
+			fh = open(metapath, 'r')
+			content = fh.read()
+			fh.close()
+		else:
+			readcache = False
+
 
 	itemcount = 0
-	if content != "":
-		genres = json.loads(content, object_pairs_hook = collections.OrderedDict)
 
-		for title in genres:
+	if readcache:
+		if content != "":
+			genres = json.loads(content, object_pairs_hook = collections.OrderedDict)
+
+			for title in genres:
+				itemcount += 1
+				li = xbmcgui.ListItem(title)
+				ctxitms = []
+				ctxitms.append((utils.translation(addon, 30101), 'Container.Update(' + viewpath + '?mode=listsubgenres&genre=' + genres[title] + ')', ))
+				#ctxitms.append((utils.translation(addon, 30111), 'Container.Update(' + viewpath + '?mode=updategenretitles&genre=' + genres[title] + '&genrename=' + title + ')', ))
+
+
+
+				ctxitms.append((utils.translation(addon,30111), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genres[title] + ',' + title + ')', ))
+				li.addContextMenuItems(ctxitms)
+				url = viewpath + '?mode=listgenretitles&genre=' + genres[title] + "&genrename=" + urllib.quote_plus(title)
+				xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
+
+		if itemcount >= 1:
+			xbmcplugin.endOfDirectory(pluginhandle)
+		else:
+			#couldn't find any items - attempt to retrieve from online
+			readcache = False
+
+	if not readcache:
+
+		cookiejar = cookielib.MozillaCookieJar()
+		if os.path.exists(cookiepath):
+			cookiejar.load(cookiepath)
+
+		response = utils.makeGetRequest('http://www.netflix.com', cookiejar, callstackpath, maxrequestsperminute)
+		matches = re.compile("<li><a href=\"(.*?)WiGenre\\?agid=(.*?)\">(.*?)</a></li>", re.DOTALL).findall(response)
+
+		genrefile = os.path.join(metapath, "genres", "genres.json")
+
+		genres = ""
+		data = collections.OrderedDict()
+		for url, genreid, genrename in matches:
+			data[utils.cleanstring(genrename)] = genreid
+
 			itemcount += 1
-			li = xbmcgui.ListItem(title)
+			li = xbmcgui.ListItem(genrename)
 			ctxitms = []
-			ctxitms.append((utils.translation(addon, 30101), 'Container.Update(' + viewpath + '?mode=listsubgenres&genre=' + genres[title] + ')', ))
+			ctxitms.append((utils.translation(addon, 30101), 'Container.Update(' + viewpath + '?mode=listsubgenres&genre=' + genreid + ')', ))
 			#ctxitms.append((utils.translation(addon, 30111), 'Container.Update(' + viewpath + '?mode=updategenretitles&genre=' + genres[title] + '&genrename=' + title + ')', ))
 
 
 
-			ctxitms.append((utils.translation(addon,30111), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genres[title] + ',' + title + ')', ))
+			ctxitms.append((utils.translation(addon,30111), 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genreid + ',' + genrename + ')', ))
 			li.addContextMenuItems(ctxitms)
-			url = viewpath + '?mode=listgenretitles&genre=' + genres[title] + "&genrename=" + urllib.quote_plus(title)
+			url = viewpath + '?mode=listgenretitles&genre=' + genreid + "&genrename=" + urllib.quote_plus(genrename)
 			xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 
-	if itemcount >= 1:
-		xbmcplugin.endOfDirectory(pluginhandle)
+		if addon.getSetting("keepcache") == "true":
+			if len(data) > 0:
+				#genres = "{" + genres + "}"
+				genres = json.dumps(data)
+				fh = open(metapath, 'w')
+				fh.write(genres)
+				fh.close()
+
+
+		if itemcount >= 1:
+			xbmcplugin.endOfDirectory(pluginhandle)
+
+
 
 def subGenres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath, genreid):
 
