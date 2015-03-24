@@ -223,7 +223,7 @@ else:
 #			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ')')
 #
 	# make sure the API url is upto date
-#	scraper.scrapeAPIURL(cookiejar, callstackpath, maxrequestsperminute, metaroot)
+	scraper.scrapeAPIURL(cookiejar, callstackpath, maxrequestsperminute, metaroot)
 
 	# display the main index
 	# def index(addon, addonID, pluginhandle, metapath, viewpath   , callstackpath, maxrequestsperminute, cookiepath)

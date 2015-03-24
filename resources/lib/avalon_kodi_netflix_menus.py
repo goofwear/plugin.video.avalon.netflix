@@ -173,24 +173,108 @@ def genres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxr
 
 def subGenres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath, genreid):
 
+
 	content = ""
-	if(os.path.exists(metapath)):
-		fh = open(metapath, 'r')
-		content = fh.read()
-		fh.close()
 
-	itemcount = 0
-	if content != "":
-		genres = json.loads(content, object_pairs_hook = collections.OrderedDict)
+	readcache = False
 
-		for title in genres:
-			itemcount += 1
-			li = xbmcgui.ListItem(title)
+	if addon.getSetting("keepcache") == "true":
+		print "Netflix: Attempting to read genres from cache"
+		readcache = True
+	else:
+		print "Netflix: Local cache is disabled get data online"
+		readcache = False
 
-			url = viewpath + '?mode=listgenretitles&genre=' + genres[title] + "&genrename="
-			xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
+	if readcache:
+		if(os.path.exists(metapath)):
+			fh = open(metapath, 'r')
+			content = fh.read()
+			fh.close()
+
+		itemcount = 0
+		if content != "":
+			genres = json.loads(content, object_pairs_hook = collections.OrderedDict)
+
+			for title in genres:
+				itemcount += 1
+				li = xbmcgui.ListItem(title)
+
+				url = viewpath + '?mode=listgenretitles&genre=' + genres[title] + "&genrename="
+				xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
+
+		if itemcount >= 1:
+			xbmcplugin.endOfDirectory(pluginhandle)
+		else:
+			#couldn't get data from cache
+			readcache = False
+
+
+	if not readcache:
+		#try:
+			cookiejar = cookielib.MozillaCookieJar()
+			if os.path.exists(cookiepath):
+				cookiejar.load(cookiepath)
+
+
+			response = utils.makeGetRequest('http://www.netflix.com/WiGenre?agid=' + genreid, cookiejar, callstackpath, maxrequestsperminute, 0)
+		#	apimatch = re.compile('\"BUILD_IDENTIFIER\":\"(.*?)\".*?\"SHAKTI_API_ROOT\":\"(.*?)\"', re.DOTALL).findall(response)
+		#	apiurl = ""
+		#	for build, root in apimatch:
+		#		apiurl = root + "/" + build
+		#	if apiurl != "":
+		#		fh = open(os.path.join(metapath, "apiurl"), 'w')
+		#		fh.write(apiurl)
+		#		fh.close()
+
+
+			if '<div id="subGenres_menu"' in response:
+				response = response[response.index('<div id="subGenres_menu"'):]
+				response = response[:response.index('</div>')]
+
+				print response
+
+				matches = re.compile("<a.*?WiGenre\\?agid=(.*?)\\&.*?\">.*?<span>(.*?)</span>.*?</a>", re.DOTALL).findall(response)
+
+
+				subGenres = ""
+				data = collections.OrderedDict()
+				for genreid, genrename in matches:
+					#if subGenres != "":
+					#	subGenres += ","
+					#subGenres += "'" + genrename + "':'" + genreid + "'"
+					data[utils.cleanstring(genrename)] = genreid
+					itemcount += 1
+					li = xbmcgui.ListItem(utils.cleanstring(genrename))
+					url = viewpath + '?mode=listgenretitles&genre=' + genreid + "&genrename="
+					xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
+
+				#if subGenres != "":
+				if addon.getSetting("keepcache") == "true":
+					if len(data) > 0:
+						#subGenres = "Genres = {" + subGenres + "}"
+						subGenres = json.dumps(data)
+						fh = open(metapath, 'w')
+						fh.write(subGenres)
+						fh.close()
+			else:
+				dialog = xbmcgui.Dialog()
+				ok = dialog.ok('Netflix', utils.translation(addon, 30122))
+
+
+				xbmc.executebuiltin('Container.Update(' + viewpath + '?mode=listgenres)')
+		#except:
+		#	print "Netflix: Error retrieving Sub-Genres"
 
 	if itemcount >= 1:
+		xbmcplugin.endOfDirectory(pluginhandle)
+
+
+
+	if itemcount < 1:
+
+		li = xbmcgui.ListItem(utils.translation(addon, 30121))
+		url = viewpath + '?mode=listsubgenres&genre=' + genreid
+		xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 		xbmcplugin.endOfDirectory(pluginhandle)
 
 def genreTitles(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath, genreid, metaroot):

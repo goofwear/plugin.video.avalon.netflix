@@ -47,6 +47,8 @@
 	<string id="30115">Remove from MyList</string>
 
 	<string id="30120">Unable to load genres (refresh)</string>
+	<string id="30121">Unable to load subgenres (refresh)</string>
+	<string id="30122">Genre does not have any subgenres</string>
 
 	<!-- Dialogs start at 30200 -->
 	<string id="30200">Genre cache has expired. Refresh cache now?</string>

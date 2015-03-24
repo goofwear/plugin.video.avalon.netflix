@@ -5,7 +5,7 @@ To Do List for version 1
   [ ] Options for live read vs. Offline scrape (v 0.5)
     [ ] Live Scrape for all sections
       [x] Genres
-      [ ] Sub-Genres
+      [x] Sub-Genres
       [ ] Genre Titles
       [ ] Seasons
       [ ] Episodes
