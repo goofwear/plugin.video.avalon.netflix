@@ -6,13 +6,13 @@ To Do List for version 1
     [ ] Live Scrape for all sections
       [x] Genres
       [x] Sub-Genres
-      [ ] Genre Titles
+      [=] Genre Titles
       [ ] Seasons
       [ ] Episodes
       [ ] MyList
       [ ] Search Results
     [ ] Add retry counter in request functionality
-    [ ] Keep a local cache? (default = yes) == only basic metadata will be available if set to "no"
+    [x] Keep a local cache? (default = yes) == only basic metadata will be available if set to "no"
     [ ] Genre cache expiry (default = 30 days) == check for new genres
     [ ] Genre Title cache expiry (default = 7 days) == check for new titles
     [ ] Title cache expiry (default = 30 days) == check for title updates

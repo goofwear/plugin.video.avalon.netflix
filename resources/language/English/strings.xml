@@ -24,6 +24,7 @@
 	<string id="30023">To force a view for a type of listing set the id of the view to use.</string>
 	<string id="30024">Use "0" to not force the view for that listing type.</string>
 	<string id="30025">Index</string>
+
 	<string id="30026">Genres</string>
 	<string id="30027">MyList</string>
 	<string id="30028">Search Results</string>

@@ -278,22 +278,82 @@ def subGenres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, m
 		xbmcplugin.endOfDirectory(pluginhandle)
 
 def genreTitles(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath, genreid, metaroot):
-	content = ""
-	if(os.path.exists(metapath)):
-		fh = open(metapath, 'r')
-		content = fh.read()
+
+	apiurl = ""
+	if(os.path.exists(os.path.join(metaroot, "apiurl"))):
+		fh = open(os.path.join(metaroot, "apiurl"), 'r')
+		apiurl = fh.read()
 		fh.close()
 
+
+	if addon.getSetting("keepcache") == "true":
+		print "Netflix: Attempting to read genre titles from cache"
+		readcache = True
+	else:
+		print "Netflix: Local cache is disabled get data online"
+		readcache = False
+
+	pagesize = addon.getSetting("titledisplaycount")
+
 	itemcount = 0
-	if content != "":
-		titles = json.loads(content)
 
-		for title in titles:
-			listTitle(title["titleId"], viewpath, pluginhandle, metaroot, addon, callstackpath, maxrequestsperminute, cookiepath, title["trackid"])
+	if readcache:
+		content = ""
+		if(os.path.exists(metapath)):
+			fh = open(metapath, 'r')
+			content = fh.read()
+			fh.close()
+
+
+			titles = json.loads(content)
+
+			for title in titles["catalogItems"]:
+				itemcount += 1
+				li = xbmcgui.ListItem(title["title"])
+				li.setArt({'poster': title["boxart"]})
+				url = viewpath + "?mode=playvideo&title=" + str(title["titleId"])
+				xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=False)
+
+
+		if itemcount >= 1:
+			xbmcplugin.endOfDirectory(pluginhandle)
+		else:
+			readcache = False
+
+
+	if not readcache:
+
+		cookiejar = cookielib.MozillaCookieJar()
+		if os.path.exists(cookiepath):
+			cookiejar.load(cookiepath)
+
+		requesturl = apiurl + "/wigenre?genreId=" + genreid + "&from=0&to=100000"
+		# take a stab that no single genre will have more than one hundred thousand titles
+		response = utils.makeGetRequest(requesturl, cookiejar, callstackpath, maxrequestsperminute, 0)
+
+		titles = json.loads(response)
+
+		if addon.getSetting("keepcache") == "true":
+
+			data = json.dumps(titles)
+			fh = open(metapath, 'w')
+			fh.write(data)
+			fh.close()
+
+		for title in titles["catalogItems"]:
 			itemcount += 1
+			li = xbmcgui.ListItem(title["title"])
+			li.setArt({'poster': title["boxart"]})
+			url = viewpath + "?mode=playvideo&title=" + str(title["titleId"])
+			xbmcplugin.addDirectoryItem(handle=pluginhandle, url=url, listitem=li, isFolder=True)
 
-	if itemcount >= 1:
-		xbmcplugin.endOfDirectory(pluginhandle)
+
+
+
+		if itemcount >= 1:
+			xbmcplugin.endOfDirectory(pluginhandle)
+
+
 
 def seasons(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxrequestsperminute, cookiepath, seriesid, metaroot):
 	#metapath = os.path.join(metapath, "titles", seriesid, "seasondata.json")

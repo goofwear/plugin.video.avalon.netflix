@@ -48,6 +48,8 @@ if not os.path.exists(metaroot):
 
 if not os.path.isdir(os.path.join(metaroot, "Genres")):
 	os.mkdir(os.path.join(metaroot, "Genres"))
+if not os.path.isdir(os.path.join(metaroot, "GenreTitles")):
+	os.mkdir(os.path.join(metaroot, "GenreTitles"))
 
 # setup the cookies
 cookiejar = cookielib.MozillaCookieJar()
@@ -82,31 +84,6 @@ elif mode == 'listgenretitles':
 	# determine the genre's meta data file path
 	genretitlesmetapath = os.path.join(metaroot, "genreTitles", genre + ".json")
 
-	# is the genre file out-of-date or missing?
-	updateGenreTitles = False
-	if os.path.exists(genretitlesmetapath):
-		oneday = 24 * 60 * 60
-		if utils.fileIsOlderThan(genretitlesmetapath, (oneday * int(addon.getSetting("cacheage")))):
-			updateGenreTitles = True
-	else:
-		updateGenreTitles = True
-
-	# if the genre file is out-of-date or missing run the update script
-	if updateGenreTitles:
-		# do the settings call for a prompt before updating?
-		if addon.getSetting("promptforcache") == "true":
-			dialog = xbmcgui.Dialog()
-			ret = dialog.yesno('Netflix', utils.translation(addon, 30200))
-			if(ret):
-				# run the script if the user says so...
-				# 'xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genres[title] + ',' + title + ')'
-				xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genre + ',' + genrename + ')')
-		else:
-			# run the script
-			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateGenreTitles.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ',' + metaroot + ',' + genre + ',' + genrename + ')')
-
-	# regardless of inprogress updates list titles for specified genre that we already have data for...
-	# def genreTitles(addon, addonID, pluginhandle, metapath           , viewpath   , callstackpath, maxrequestsperminute, cookiepath, genreid, metaroot):
 	menus.genreTitles(addon, addonID, pluginhandle, genretitlesmetapath, sys.argv[0], callstackpath, maxrequestsperminute, cookiepath, genre, metaroot)
 elif mode == 'listseasons':
 	# determine the mata data folder for the series' title store
