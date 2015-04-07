@@ -441,13 +441,20 @@ def scrapeMyList(cookies, callstackpath, maxrequestsperminute, metapath):
 
 
 def scrapeAPIURL(cookies, callstackpath, maxrequestsperminute, metapath):
-	response = utils.makeGetRequest("http://www.netflix.com/WiGenre?agid=83", cookies, callstackpath, maxrequestsperminute, 0)
+	response = utils.makeGetRequest("https://www.netflix.com/YourAccount", cookies, callstackpath, maxrequestsperminute, 0)
+
+	print response
 
 	apimatch = re.compile('\"BUILD_IDENTIFIER\":\"(.*?)\".*?\"SHAKTI_API_ROOT\":\"(.*?)\"', re.DOTALL).findall(response)
 	apiurl = ""
 	for build, root in apimatch:
 		apiurl = root + "/" + build
+		print apiurl
+
+	print apiurl
+
+
 	if apiurl != "":
-		fh = open(os.path.join(metapath, "apiurl"), 'w')
+		fh = open(metapath, 'w')
 		fh.write(apiurl)
 		fh.close()

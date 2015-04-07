@@ -38,7 +38,7 @@ metaroot = xbmc.translatePath('special://profile/addon_data/' + addonID + '/meta
 playerpath = xbmc.translatePath('special://home/addons/' + addonID + '/resources/LaunchPlayer.exe')
 cookiepath = xbmc.translatePath('special://profile/addon_data/' + addonID + '/cookies')
 callstackpath = xbmc.translatePath('special://profile/addon_data/' + addonID + '/callstack')
-apiurlpath = xbmc.translatePath('special://profile/addon_data/' + addonID + '/apiurl')
+apiurlpath = xbmc.translatePath('special://profile/addon_data/' + addonID + '/meta/apiurl')
 
 
 
@@ -69,6 +69,19 @@ track = urllib.unquote_plus(params.get('track',''))
 
 auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute)
 cookiejar.save(cookiepath)
+
+# we need to check the API URL regularly
+doAPIURLScrape = False
+if os.path.exists(apiurlpath):
+	# get new API every 12 hours
+	maxAPIAge = time.time() + (60 * 60 * 12)
+	if utils.fileIsOlderThan(apiurlpath, maxAPIAge):
+		doAPIURLScrape = True
+else:
+	doAPIURLScrape = True
+
+if doAPIURLScrape:
+	scraper.scrapeAPIURL(cookiejar, callstackpath, maxrequestsperminute, apiurlpath)
 
 
 # The real guts start here... which mode are we running?
@@ -200,7 +213,7 @@ else:
 #			xbmc.executebuiltin('xbmc.runscript(special://home/addons/' + addonID + '/resources/scripts/UpdateMyList.py, ' + addon.getSetting("username") + ', ' + addon.getSetting("password") + ', ' + addon.getSetting("cacheage") + ', ' + cookiepath + ', ' + callstackpath + ', ' + str(maxrequestsperminute) + ', ' + addonID + ', ' + metaroot + ')')
 #
 	# make sure the API url is upto date
-	scraper.scrapeAPIURL(cookiejar, callstackpath, maxrequestsperminute, metaroot)
+#	scraper.scrapeAPIURL(cookiejar, callstackpath, maxrequestsperminute, metaroot)
 
 	# display the main index
 	# def index(addon, addonID, pluginhandle, metapath, viewpath   , callstackpath, maxrequestsperminute, cookiepath)
