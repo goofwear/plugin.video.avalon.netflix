@@ -120,6 +120,12 @@ def genres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, maxr
 	if not readcache:
 
 		try:
+
+			username = addon.getSetting('username')
+			password = addon.getSetting('password')
+			auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute)
+			cookiejar.save(cookiepath)
+
 			cookiejar = cookielib.MozillaCookieJar()
 			if os.path.exists(cookiepath):
 				cookiejar.load(cookiepath)
@@ -212,8 +218,15 @@ def subGenres(addon, addonID, pluginhandle, metapath, viewpath, callstackpath, m
 	if not readcache:
 		#try:
 			cookiejar = cookielib.MozillaCookieJar()
+
+
 			if os.path.exists(cookiepath):
 				cookiejar.load(cookiepath)
+
+			username = addon.getSetting('username')
+			password = addon.getSetting('password')
+			auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute)
+			cookiejar.save(cookiepath)
 
 
 			response = utils.makeGetRequest('http://www.netflix.com/WiGenre?agid=' + genreid, cookiejar, callstackpath, maxrequestsperminute, 0)
@@ -324,8 +337,18 @@ def genreTitles(addon, addonID, pluginhandle, metapath, viewpath, callstackpath,
 	if not readcache:
 
 		cookiejar = cookielib.MozillaCookieJar()
+
+
+
+
 		if os.path.exists(cookiepath):
 			cookiejar.load(cookiepath)
+
+		username = addon.getSetting('username')
+		password = addon.getSetting('password')
+		auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute)
+		cookiejar.save(cookiepath)
+
 
 		requesturl = apiurl + "/wigenre?genreId=" + genreid + "&from=0&to=100000"
 		# take a stab that no single genre will have more than one hundred thousand titles

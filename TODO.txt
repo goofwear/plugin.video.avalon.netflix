@@ -38,3 +38,4 @@ To Do List for version 1
   [ ] Cross platform (v0.8)
 
   [ ] Better remote control handling (v0.9)
+    Some of this can be pulled off by using EventGhost and the libCEC plugin... is this enough?

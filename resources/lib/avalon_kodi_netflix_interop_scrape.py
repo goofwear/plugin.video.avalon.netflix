@@ -449,9 +449,6 @@ def scrapeAPIURL(cookies, callstackpath, maxrequestsperminute, metapath):
 	apiurl = ""
 	for build, root in apimatch:
 		apiurl = root + "/" + build
-		print apiurl
-
-	print apiurl
 
 
 	if apiurl != "":

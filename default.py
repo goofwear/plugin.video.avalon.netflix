@@ -67,8 +67,8 @@ seasonid = urllib.unquote_plus(params.get('seasonid', ''))
 season = urllib.unquote_plus(params.get('season', ''))
 track = urllib.unquote_plus(params.get('track',''))
 
-auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute)
-cookiejar.save(cookiepath)
+#auth.login(username, password, cookiejar, callstackpath, maxrequestsperminute)
+#cookiejar.save(cookiepath)
 
 # we need to check the API URL regularly
 doAPIURLScrape = False
