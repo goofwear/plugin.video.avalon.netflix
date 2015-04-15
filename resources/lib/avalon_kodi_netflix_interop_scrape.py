@@ -183,6 +183,7 @@ def scrapeGenreTitles(cookies, callstackpath, maxrequestsperminute, metapath, ge
 def scrapeSeasonData(cookies, callstackpath, maxrequestsperminute, metapath, titleid):
 	seasondataurl = "http://api-global.netflix.com/desktop/odp/episodes?forceEpisodes=true&routing=redirect&video=" + titleid
 	seasondata = utils.makeGetRequest(seasondataurl, cookies, callstackpath, maxrequestsperminute)
+	seasondata = seasondata[seasondata.index("{\"title\":"):]
 
 	fh = open(os.path.join(metapath, "Titles", titleid, "seasondata.json"),'w')
 	fh.write(seasondata)
@@ -244,7 +245,7 @@ def scrapeSeasonData(cookies, callstackpath, maxrequestsperminute, metapath, tit
 			fh.write(json.dumps(synopsis))
 			fh.close()
 
-		
+
 
 def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid, trackid):
 
@@ -290,7 +291,7 @@ def scrapeTitle(cookies, callstackpath, maxrequestsperminute, metapath, titleid,
 
 				seasondataurl = "http://api-global.netflix.com/desktop/odp/episodes?forceEpisodes=true&routing=redirect&video=" + titleid
 				seasondata = utils.makeGetRequest(seasondataurl, cookies, callstackpath, maxrequestsperminute)
-
+				seasondata = seasondata[seasondata.index("{\"title\":"):]
 				fh = open(os.path.join(metapath, "Titles", titleid, "seasondata.json"),'w')
 				fh.write(seasondata)
 				fh.close()

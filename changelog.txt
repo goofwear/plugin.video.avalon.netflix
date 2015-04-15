@@ -1,3 +1,6 @@
+v 0.4.01 (2015-04-15)
+  FIXED: Scraping season data fails when JSON response contains a failed stack trace (DareDevil)
+
 v 0.4.0 (2015-03-17)
   Version Bump
 
